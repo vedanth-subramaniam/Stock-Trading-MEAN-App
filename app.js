@@ -30,6 +30,7 @@ app.get('/search/:stockTicker', async function (req, res) {
 
         // Charts API to fetch past 6 hours data and plot it
 
+        // const chartPointResponse = await axios.get('')
 
         let combinedStockTabResponse = {
             stockProfile: stockProfileResponse.data,
@@ -45,6 +46,38 @@ app.get('/search/:stockTicker', async function (req, res) {
         res.status(500).json({ error: 'Something went wrong' });
     }
 });
+
+app.get('/charts/:stockTicker', async function (req, res) {
+
+    const stockTickerSymbol = req.params.stockTicker;
+    console.log("Charts API");
+    try {
+        const multiplier = 1;
+        const timespan = 'day';
+
+        const to_date = new Date();
+        const from_date = new Date(to_date - 2 * 365 * 24 * 60 * 60 * 1000); // 2 years ago
+
+        const to_date_str = to_date.toISOString().split('T')[0];
+        const from_date_str = from_date.toISOString().split('T')[0];
+
+        const api_url = `https://api.polygon.io/v2/aggs/ticker/${stockTickerSymbol}/range/${multiplier}/${timespan}/${from_date_str}/${to_date_str}?adjusted=true&sort=asc&apiKey=mwjPq5ceMqn18edHgYpUrK5ZgBul4p2v`;
+        console.log(api_url);
+        const response = await axios.get(api_url);
+
+        const chartDetails = response.data;
+
+        if (!chartDetails) {
+            return res.status(400).json({ error: 'Chart details not found. Please check stock ticker symbol again.' });
+        }
+
+        res.send(chartDetails);
+
+    } catch (error) {
+        res.status(500).json({ error: 'Something went wrong' });
+    }
+});
+
 
 app.get('/news/:stockTicker', async function (req, res) {
 
