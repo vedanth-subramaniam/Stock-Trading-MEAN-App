@@ -31,22 +31,22 @@ app.get('/search/:stockTicker', async function (req, res) {
         // Charts API to fetch past 6 hours data and plot it
 
 
-        let combinedResponse = {
+        let combinedStockTabResponse = {
             stockProfile: stockProfileResponse.data,
             latestPrice: latestPriceResponse.data,
             companyPeers: companyPeersResponse.data
         };
 
 
-        console.log("Combined response is", combinedResponse);
-        res.send(combinedResponse);
+        console.log("Combined response is", combinedStockTabResponse);
+        res.send(combinedStockTabResponse);
 
     } catch (error) {
         res.status(500).json({ error: 'Something went wrong' });
     }
 });
 
-app.get('/companyNews/:stockTicker', async function (req, res) {
+app.get('/news/:stockTicker', async function (req, res) {
 
     try {
         const stockTicker = req.params.stockTicker;
@@ -80,6 +80,61 @@ app.get('/companyNews/:stockTicker', async function (req, res) {
     }
 });
 
+
+app.get('/insights/:stockTicker', async function (req, res) {
+
+    try {
+
+        const stockTicker = req.params.stockTicker;
+
+        const recommendationResponse = await axios.get('https://finnhub.io/api/v1/stock/recommendation', {
+            params: {
+                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                symbol: stockTicker
+            }
+        });
+
+        console.log(recommendationResponse);
+
+        const now = new Date();
+        const to_date_str = now.toISOString().split('T')[0];
+        const from_date_str = "2022-01-01";
+
+        const insiderSentimentResponse = await axios.get('https://finnhub.io/api/v1/stock/insider-sentiment', {
+            params: {
+                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                symbol: stockTicker,
+                from: from_date_str,
+                to: to_date_str
+            }
+        });
+
+        console.log(insiderSentimentResponse);
+
+        const earningsResponse = await axios.get('https://finnhub.io/api/v1/stock/earnings', {
+            params: {
+                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                symbol: stockTicker
+            }
+        });
+
+        console.log(earningsResponse);
+
+        let combinedInsightsResponse = {
+            stockRecommendations: recommendationResponse.data,
+            insiderSentiments: insiderSentimentResponse.data,
+            companyEarnings: earningsResponse.data
+        };
+
+        res.send(combinedInsightsResponse);
+
+    } catch (error) {
+
+        console.error('Error fetching company insights:', error.message);
+        return res.status(500).json({ error: 'Internal server error' });
+
+    }
+});
 
 function filterCompleteEntries(articles) {
     return articles.filter(article => Object.values(article).every(value => value !== ''));
