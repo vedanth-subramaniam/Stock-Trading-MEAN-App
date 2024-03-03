@@ -169,6 +169,21 @@ app.get('/insights/:stockTicker', async function (req, res) {
     }
 });
 
+
+app.get('/autoComplete/:query', async function (req, res) {
+
+    const query = req.params.query;
+
+    const autoCompleteResponse = await axios.get('https://finnhub.io/api/v1/search', {
+        params: {
+            q: query,
+            token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20'
+        }
+    });
+
+    res.send(autoCompleteResponse.data);
+});
+
 function filterCompleteEntries(articles) {
     return articles.filter(article => Object.values(article).every(value => value !== ''));
 }
