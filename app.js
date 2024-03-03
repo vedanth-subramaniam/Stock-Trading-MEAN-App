@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 
+require('dotenv').config();
+const API_KEY = process.env.API_KEY;
+
 app.get('/search/:stockTicker', async function (req, res) {
 
     const stockTickerSymbol = req.params.stockTicker;
@@ -9,21 +12,21 @@ app.get('/search/:stockTicker', async function (req, res) {
     try {
         const stockProfileResponse = await axios.get('https://finnhub.io/api/v1/stock/profile2', {
             params: {
-                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                token: API_KEY,
                 symbol: stockTickerSymbol
             }
         });
 
         const latestPriceResponse = await axios.get('https://finnhub.io/api/v1/quote', {
             params: {
-                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                token: API_KEY,
                 symbol: stockTickerSymbol
             }
         });
 
         const companyPeersResponse = await axios.get('https://finnhub.io/api/v1/stock/peers', {
             params: {
-                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                token: API_KEY,
                 symbol: stockTickerSymbol
             }
         });
@@ -46,6 +49,7 @@ app.get('/search/:stockTicker', async function (req, res) {
         res.status(500).json({ error: 'Something went wrong' });
     }
 });
+
 
 app.get('/charts/:stockTicker', async function (req, res) {
 
@@ -94,7 +98,7 @@ app.get('/news/:stockTicker', async function (req, res) {
                 symbol: stockTicker,
                 from: from_date_str,
                 to: to_date_str,
-                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                token: API_KEY,
             },
         });
 
@@ -122,7 +126,7 @@ app.get('/insights/:stockTicker', async function (req, res) {
 
         const recommendationResponse = await axios.get('https://finnhub.io/api/v1/stock/recommendation', {
             params: {
-                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                token: API_KEY,
                 symbol: stockTicker
             }
         });
@@ -135,7 +139,7 @@ app.get('/insights/:stockTicker', async function (req, res) {
 
         const insiderSentimentResponse = await axios.get('https://finnhub.io/api/v1/stock/insider-sentiment', {
             params: {
-                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                token: API_KEY,
                 symbol: stockTicker,
                 from: from_date_str,
                 to: to_date_str
@@ -146,7 +150,7 @@ app.get('/insights/:stockTicker', async function (req, res) {
 
         const earningsResponse = await axios.get('https://finnhub.io/api/v1/stock/earnings', {
             params: {
-                token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20',
+                token: API_KEY,
                 symbol: stockTicker
             }
         });
@@ -177,7 +181,7 @@ app.get('/autoComplete/:query', async function (req, res) {
     const autoCompleteResponse = await axios.get('https://finnhub.io/api/v1/search', {
         params: {
             q: query,
-            token: 'cmuk1nhr01qltmc0qh1gcmuk1nhr01qltmc0qh20'
+            token: API_KEY
         }
     });
 
