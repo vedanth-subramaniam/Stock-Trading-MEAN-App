@@ -1,4 +1,4 @@
-# CSCI571Assignment3Angular
+# CSCI-571 Assignment3 Angular
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.2.2.
 
