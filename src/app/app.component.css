@@ -1,0 +1,16 @@
+.navbar {
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.navbar-nav .nav-link {
+  color: rgba(255,255,255,.5);
+
+  &:hover {
+    color: rgba(255,255,255,.75);
+  }
+
+  &.active {
+    color: #fff;
+  }
+}
