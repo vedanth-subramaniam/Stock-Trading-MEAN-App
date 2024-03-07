@@ -3,9 +3,15 @@
     <a class="navbar-brand">Stock Search</a>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav ms-auto">
-        <button type="button" class="btn nav-link mx-1 " [class.active]="showComponent === 'search'" (click)="showComponent='search'">Search</button>
-        <button type="button" class="btn nav-link mx-1" [class.active]="showComponent === 'wishlist'" (click)="showComponent='wishlist'">Watchlist</button>
-        <button type="button" class="btn nav-link mx-1" [class.active]="showComponent === 'portfolio'" (click)="showComponent='portfolio'">Portfolio</button>
+        <button type="button" class="btn nav-link mx-1 " [class.active]="showComponent === 'search'"
+                (click)="showComponent='search'">Search
+        </button>
+        <button type="button" class="btn nav-link mx-1" [class.active]="showComponent === 'wishlist'"
+                (click)="showComponent='wishlist'">Watchlist
+        </button>
+        <button type="button" class="btn nav-link mx-1" [class.active]="showComponent === 'portfolio'"
+                (click)="showComponent='portfolio'">Portfolio
+        </button>
       </div>
     </div>
   </div>

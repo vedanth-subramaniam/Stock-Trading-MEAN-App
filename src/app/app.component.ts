@@ -15,6 +15,5 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 })
 export class AppComponent {
   title = 'CSCI-571-Assignment-3-Angular';
-  showComponent: 'search' | 'wishlist' | 'portfolio' = 'search'; // Default to 'search'
-
+  showComponent: 'search' | 'wishlist' | 'portfolio' = 'search';
 }
