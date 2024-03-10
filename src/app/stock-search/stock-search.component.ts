@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import {StockApiService} from "../stock-api.service";
+import {interval, startWith, Subscription, tap} from "rxjs";
 
 @Component({
   selector: 'app-stock-search',
@@ -12,9 +13,10 @@ import {StockApiService} from "../stock-api.service";
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
 })
-export class StockSearchComponent implements OnInit {
+export class StockSearchComponent implements OnInit, OnDestroy {
 
   tickerSymbol: string = '';
+  private subscriptions: Subscription = new Subscription();
 
   constructor(private stockService: StockApiService) {
   }
@@ -26,27 +28,34 @@ export class StockSearchComponent implements OnInit {
   searchStock() {
     console.log('Searching for stock:', this.tickerSymbol);
 
-    this.stockService.getCompanyCommonDetailsAPI(this.tickerSymbol).subscribe({
-      next: (response: any) => {
-        console.log(response);
-      }
-    });
+    const apiInterval$ = interval(15000).pipe(startWith(0));
+
+    this.subscriptions.add(
+      apiInterval$.pipe(
+        tap(() => this.stockService.getCompanyCommonDetailsAPI(this.tickerSymbol).subscribe(
+          (response) => {
+            console.log('Company Common Details:', response);
+          },
+          error => console.error('Error fetching Company Common Details', error)
+        ))
+      ).subscribe()
+    );
 
     this.stockService.getNewsTabDetailsAPI(this.tickerSymbol).subscribe({
       next: (response: any) => {
-        console.log(response);
+        console.log('News Tab Details:', response);
       }
     });
 
     this.stockService.getChartsTabDetailsAPI(this.tickerSymbol).subscribe({
       next: (response: any) => {
-        console.log(response);
+        console.log('Charts Tab Details:', response);
       }
     });
 
     this.stockService.getInsightsTabDetailsAPI(this.tickerSymbol).subscribe({
       next: (response: any) => {
-        console.log(response);
+        console.log('Insights Tab Details:', response);
       }
     });
 
@@ -54,6 +63,11 @@ export class StockSearchComponent implements OnInit {
 
   clearSearch() {
     this.tickerSymbol = '';
-    // Implement the logic to clear out the currently searched  results and show the initial search page
+    this.subscriptions.unsubscribe();
+  }
+
+  ngOnDestroy() {
+    // Unsubscribe to prevent memory leaks
+    this.subscriptions.unsubscribe();
   }
 }
