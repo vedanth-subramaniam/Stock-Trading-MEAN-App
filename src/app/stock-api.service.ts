@@ -9,6 +9,10 @@ export class StockApiService {
   constructor(private http: HttpClient) {
   }
 
+  getAutocompleteAPI(stockVal: any) {
+    return this.http.get("http://localhost:3000/autoComplete/" + stockVal);
+  }
+
   getCompanyCommonDetailsAPI(stockTicker: any) {
     return this.http.get("http://localhost:3000/search/" + stockTicker);
   }

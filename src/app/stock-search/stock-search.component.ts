@@ -2,13 +2,15 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import {StockApiService} from "../stock-api.service";
-import {interval, startWith, Subscription, tap} from "rxjs";
+import {debounceTime, filter, interval, startWith, Subscription, switchMap, tap} from "rxjs";
+import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
+import {MatAutocomplete, MatOption} from "@angular/material/autocomplete";
 
 @Component({
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -18,11 +20,23 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   tickerSymbol: string = '';
   private subscriptions: Subscription = new Subscription();
   stockSearchControl = new FormControl();
+  autocompleteSearchResults: any = [];
 
   constructor(private stockService: StockApiService) {
   }
 
   ngOnInit() {
+
+    this.stockSearchControl.valueChanges
+      .pipe(
+        debounceTime(500),
+        filter(value => value != null && value.trim() != ''),// wait for 500ms pause in events
+        switchMap(value => this.stockService.getAutocompleteAPI(value)) // switch to new search observable each time the term changes
+      )
+      .subscribe((results: any) => {
+        console.log("Autocomplete results: " + results.result);
+        this.autocompleteSearchResults = results.result;
+      });
   }
 
   searchStock() {
@@ -65,6 +79,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   clearSearch() {
     console.log("Clear search");
+    this.stockSearchControl.reset();
     this.tickerSymbol = '';
     this.subscriptions.unsubscribe();
   }
