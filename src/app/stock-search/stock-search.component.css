@@ -29,3 +29,9 @@
 h1 {
   font-size: 30px;
 }
+
+.form-stock-search {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+}

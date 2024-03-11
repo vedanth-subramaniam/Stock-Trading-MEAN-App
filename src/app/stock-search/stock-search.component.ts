@@ -4,13 +4,16 @@ import {HttpClientModule} from "@angular/common/http";
 import {StockApiService} from "../stock-api.service";
 import {debounceTime, filter, interval, startWith, Subscription, switchMap, tap} from "rxjs";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
-import {MatAutocomplete, MatOption} from "@angular/material/autocomplete";
+import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
+import {MatFormField} from "@angular/material/form-field";
+import {MatInput} from "@angular/material/input";
+import {auto} from "@popperjs/core";
 
 @Component({
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -86,6 +89,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     // Unsubscribe to prevent memory leaks
+    this.autocompleteSearchResults = [];
     this.subscriptions.unsubscribe();
   }
+
+  protected readonly auto = auto;
 }
