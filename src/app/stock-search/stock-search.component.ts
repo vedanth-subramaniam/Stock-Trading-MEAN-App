@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormsModule} from "@angular/forms";
+import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import {StockApiService} from "../stock-api.service";
 import {interval, startWith, Subscription, tap} from "rxjs";
@@ -8,7 +8,7 @@ import {interval, startWith, Subscription, tap} from "rxjs";
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule
+    FormsModule, HttpClientModule, ReactiveFormsModule
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -17,15 +17,17 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   tickerSymbol: string = '';
   private subscriptions: Subscription = new Subscription();
+  stockSearchControl = new FormControl();
 
   constructor(private stockService: StockApiService) {
   }
 
-  ngOnInit(): void {
-    console.log("Hey");
+  ngOnInit() {
   }
 
   searchStock() {
+
+    this.tickerSymbol = this.stockSearchControl.value;
     console.log('Searching for stock:', this.tickerSymbol);
 
     const apiInterval$ = interval(15000).pipe(startWith(0));
@@ -62,6 +64,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   clearSearch() {
+    console.log("Clear search");
     this.tickerSymbol = '';
     this.subscriptions.unsubscribe();
   }
