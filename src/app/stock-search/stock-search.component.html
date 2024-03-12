@@ -9,11 +9,12 @@
                placeholder="Enter stock ticker symbol" aria-label="Stock ticker symbol" [matAutocomplete]="auto">
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
           @for (option of autocompleteSearchResults; track option) {
-            <mat-option [value]="option">{{ option.displaySymbol + " | " + option.description }}</mat-option>
+            <mat-option [value]="option.displaySymbol" (click)="searchStock()">{{ option.displaySymbol + " | " + option.description }}
+            </mat-option>
           }
         </mat-autocomplete>
         <div class="input-group-append d-flex">
-          <button class="btn no-outline" type="button" (click)="searchStock()">
+          <button class="btn no-outline" type="button" (keypress)="searchStock()">
             <i class="bi bi-search"></i>
           </button>
           <button class="btn border-0" type="button" (click)="clearSearch()">
@@ -25,6 +26,16 @@
   </div>
 </section>
 <section id="common-company-info-section">
+  <ng-template #companyInfo>
+    <div>
+    </div>
+    <div>
+
+    </div>
+    <div>
+
+    </div>
+  </ng-template>
 </section>
 <section id="company-summary-section">
 </section>
