@@ -4,19 +4,19 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav ms-auto">
         <button type="button" class="btn nav-link" [class.active]="showComponent === 'search'"
-                (click)="showComponent='search'">Search
+                (click)="showComponent='search'" routerLink="/search" routerLinkActive="active">Search
         </button>
         <button type="button" class="btn nav-link" [class.active]="showComponent === 'wishlist'"
-                (click)="showComponent='wishlist'">Watchlist
+                (click)="showComponent='wishlist'" routerLink="/wishlist" routerLinkActive="active">Watchlist
         </button>
         <button type="button" class="btn nav-link" [class.active]="showComponent === 'portfolio'"
-                (click)="showComponent='portfolio'">Portfolio
+                (click)="showComponent='portfolio'" routerLink="/portfolio" routerLinkActive="active">Portfolio
         </button>
       </div>
     </div>
   </div>
 </nav>
-
-<app-stock-search *ngIf="showComponent === 'search'"></app-stock-search>
-<app-stock-wishlist *ngIf="showComponent === 'wishlist'"></app-stock-wishlist>
-<app-stock-portfolio *ngIf="showComponent === 'portfolio'"></app-stock-portfolio>
+<router-outlet></router-outlet>
+<!--<app-stock-search *ngIf="showComponent === 'search'"></app-stock-search>-->
+<!--<app-stock-wishlist *ngIf="showComponent === 'wishlist'"></app-stock-wishlist>-->
+<!--<app-stock-portfolio *ngIf="showComponent === 'portfolio'"></app-stock-portfolio>-->
