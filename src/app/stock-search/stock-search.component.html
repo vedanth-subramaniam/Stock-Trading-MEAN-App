@@ -1,20 +1,21 @@
 <section id="search-section">
-  <div class="container mt-5 d-flex flex-column justify-content-center">
-    <div class="d-flex justify-content-center mb-2">
+  <div class="container mt-5 d-md-flex flex-column justify-content-center">
+    <div class="d-md-flex justify-content-center mb-2">
       <h1>STOCK SEARCH</h1>
     </div>
-    <div class="d-flex justify-content-center">
+    <div class="d-md-flex justify-content-center">
       <div class="input-group mb-3 search-bar">
         <input matInput type="text" [formControl]="stockSearchControl" class="form-control me-2 border-0 no-outline"
                placeholder="Enter stock ticker symbol" aria-label="Stock ticker symbol" [matAutocomplete]="auto">
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
           @for (option of autocompleteSearchResults; track option) {
-            <mat-option [value]="option.displaySymbol" (click)="searchStock()">{{ option.displaySymbol + " | " + option.description }}
+            <mat-option [value]="option.displaySymbol"
+                        (click)="searchStock()">{{ option.displaySymbol + " | " + option.description }}
             </mat-option>
           }
         </mat-autocomplete>
         <div class="input-group-append d-flex">
-          <button class="btn no-outline" type="button" (keypress)="searchStock()">
+          <button class="btn no-outline" type="button" (click)="searchStock()">
             <i class="bi bi-search"></i>
           </button>
           <button class="btn border-0" type="button" (click)="clearSearch()">
@@ -25,15 +26,29 @@
     </div>
   </div>
 </section>
+<div *ngIf="(currentTab == 'Summary') then companyInfo">
+
+</div>
 <section id="common-company-info-section">
   <ng-template #companyInfo>
-    <div>
-    </div>
-    <div>
-
-    </div>
-    <div>
-
+    <div class="d-md-flex company-info-card">
+      <div>
+        <ul>
+          <li>{{ stockProfile?.ticker }}</li>
+          <li>{{ stockProfile?.name }}</li>
+          <li>{{ stockProfile?.exchange }}</li>
+        </ul>
+      </div>
+      <div>
+        <img [src]="stockProfile?.logo">
+      </div>
+      <div>
+        <ul>
+          <li>{{ latestPrice?.c }}</li>
+          <li>{{ latestPrice?.d }}</li>
+          <li>{{ latestPrice?.t | date }}</li>
+        </ul>
+      </div>
     </div>
   </ng-template>
 </section>

@@ -2,8 +2,18 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import {StockApiService} from "../stock-api.service";
-import {debounceTime, filter, interval, startWith, Subscription, switchMap, tap} from "rxjs";
-import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  interval, of,
+  startWith,
+  Subscription,
+  switchMap,
+  tap
+} from "rxjs";
+import {AsyncPipe, DatePipe, NgForOf, NgIf} from "@angular/common";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
@@ -13,7 +23,7 @@ import {auto} from "@popperjs/core";
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -23,8 +33,15 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   tickerSymbol: string = '';
   private subscriptions: Subscription = new Subscription();
   stockSearchControl = new FormControl();
-  autocompleteSearchResults: any = [];
+  autocompleteSearchResults: StockOption[] = [];
+
+  currentTab = "";
+
   companyInfoResponse!: any;
+  companyPeers: any;
+  latestPrice: any;
+  stockProfile: any;
+
   newsResponse!: any;
   chartResponse!: any;
   insightsResponse!: any;
@@ -36,18 +53,25 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     console.log("Init");
     this.autocompleteSearchResults = [];
-    console.log(this.autocompleteSearchResults);
-    this.stockSearchControl.valueChanges
-      .pipe(
-        debounceTime(500),
-        tap(() => this.autocompleteSearchResults = []),
-        filter(value => value != null && value.trim() != ''),// wait for 500ms pause in events
-        switchMap(value => this.stockService.getAutocompleteAPI(value)) // switch to new search observable each time the term changes
+    this.stockSearchControl.valueChanges.pipe(
+      debounceTime(700), // Wait for 700ms pause in events
+      distinctUntilChanged(), // Only emit when the current value is different from the last
+      tap(() => this.autocompleteSearchResults = []), // Reset results on new search
+      filter(value => value != null && value.trim() != ''), // Filter out empty or null values
+      switchMap(value =>
+        this.stockService.getAutocompleteAPI(value).pipe(
+          catchError(error => {
+            // Handle or log the error
+            console.error('Error fetching autocomplete results:', error);
+            return of([]); // Return an empty array or appropriate fallback value on error
+          })
+        )
       )
-      .subscribe((results: any) => {
-        console.log("Autocomplete results: " + results.result);
-        this.autocompleteSearchResults = results.result;
-      });
+    ).subscribe((results: any) => {
+      console.log("Autocomplete results:", results.result);
+      this.autocompleteSearchResults = results.result;
+      this.autocompleteSearchResults = this.autocompleteSearchResults.filter(option => !option.displaySymbol.includes('.'));
+    });
   }
 
   searchStock() {
@@ -61,8 +85,12 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       apiInterval$.pipe(
         tap(() => this.stockService.getCompanyCommonDetailsAPI(this.tickerSymbol).subscribe(
           (response) => {
-            console.log('Company Common Details:', response);
             this.companyInfoResponse = response;
+            console.log('Company Common Details:', this.companyInfoResponse);
+            this.stockProfile = this.companyInfoResponse.stockProfile;
+            this.latestPrice = this.companyInfoResponse.latestPrice;
+            this.companyPeers = this.companyInfoResponse.companyPeers;
+            this.currentTab = "Summary";
           },
           error => console.error('Error fetching Company Common Details', error)
         ))
@@ -71,20 +99,22 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     this.stockService.getNewsTabDetailsAPI(this.tickerSymbol).subscribe({
       next: (response: any) => {
-        console.log('News Tab Details:', response);
         this.newsResponse = response;
+        console.log('News Tab Details:', this.newsResponse);
       }
     });
 
     this.stockService.getChartsTabDetailsAPI(this.tickerSymbol).subscribe({
       next: (response: any) => {
-        console.log('Charts Tab Details:', response);
+        this.chartResponse = response;
+        console.log('Charts Tab Details:', this.chartResponse);
       }
     });
 
     this.stockService.getInsightsTabDetailsAPI(this.tickerSymbol).subscribe({
       next: (response: any) => {
-        console.log('Insights Tab Details:', response);
+        this.insightsResponse = response;
+        console.log('Insights Tab Details:', this.insightsResponse);
       }
     });
 
@@ -94,7 +124,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Clear search");
     this.stockSearchControl.reset();
     this.tickerSymbol = '';
+    this.autocompleteSearchResults = [];
     this.subscriptions.unsubscribe();
+    this.currentTab = "";
   }
 
   ngOnDestroy() {
@@ -104,4 +136,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   protected readonly auto = auto;
+}
+
+interface StockOption {
+  displaySymbol: string;
+  description: string;
 }
