@@ -35,3 +35,7 @@ h1 {
   max-width: 100%;
   display: flex;
 }
+
+.list-group li{
+  border-bottom: 0 none;
+}

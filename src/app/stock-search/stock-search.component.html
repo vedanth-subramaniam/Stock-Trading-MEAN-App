@@ -69,12 +69,35 @@
   </section>
   <section id="company-summary-section">
     <ng-template #summaryTab>
-      <p>Summary Tab</p>
+      <div>
+        <div>
+          <ul class="list-group">
+            <li class="list-group-item">High Price : {{ latestPrice?.h }}</li>
+            <li class="list-group-item">Low Price: {{ latestPrice?.l }}</li>
+            <li class="list-group-item">Open Price: {{ latestPrice?.o }}</li>
+            <li class="list-group-item">Prev. Close: {{ latestPrice?.pc }}</li>
+          </ul>
+        </div>
+        <div>
+          <div>
+            <p><strong>About the company</strong></p>
+          </div>
+          <div>
+            <p><strong>IPO Start Date: </strong>{{ stockProfile?.ipo }}</p>
+            <p><strong>Industry: </strong>{{ stockProfile?.finnhubIndustry }}</p>
+            <p><strong>Webpage: </strong><a href="{{stockProfile?.weburl}}">{{ stockProfile?.weburl }}</a></p>
+            <p><strong>Company Peers: </strong></p>
+            <p>{{ companyPeers }}</p>
+          </div>
+        </div>
+      </div>
     </ng-template>
   </section>
   <section id="company-news-section">
     <ng-template #newsTab>
-      <p>News Tab</p>
+      <div>
+        
+      </div>
     </ng-template>
   </section>
   <section id="company-charts-section">
