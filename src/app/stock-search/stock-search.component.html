@@ -55,32 +55,36 @@
             <li class="list-group">{{ latestPrice?.t | date }}</li>
           </ul>
         </div>
-        <nav>
-          <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <button class="nav-link active" id="nav-summary-tab" data-bs-toggle="tab" data-bs-target="#nav-home"
-                    type="button" role="tab" aria-controls="nav-home" aria-selected="false">Summary
-            </button>
-            <button class="nav-link" id="nav-news-tab" data-bs-toggle="tab" data-bs-target="#nav-news" type="button"
-                    role="tab" aria-controls="nav-news" aria-selected="false">Top News
-            </button>
-            <button class="nav-link" id="nav-charts-tab" data-bs-toggle="tab" data-bs-target="#nav-charts" type="button"
-                    role="tab" aria-controls="nav-charts" aria-selected="false">Charts
-            </button>
-            <button class="nav-link" id="nav-insights-tab" data-bs-toggle="tab" data-bs-target="#nav-insights"
-                    type="button" role="tab" aria-controls="nav-insights" aria-selected="false">Insights
-            </button>
-          </div>
-        </nav>
       </div>
-
+      <div>
+        <mat-tab-group [(selectedIndex)]="selectedIndex" (selectedIndexChange)="selectTab($event)">
+          <mat-tab label="Summary"></mat-tab>
+          <mat-tab label="Top News"></mat-tab>
+          <mat-tab label="Charts"></mat-tab>
+          <mat-tab label="Insights"></mat-tab>
+        </mat-tab-group>
+      </div>
+      <ng-container *ngTemplateOutlet="getTemplate()"></ng-container>
     </ng-template>
   </section>
   <section id="company-summary-section">
+    <ng-template #summaryTab>
+      <p>Summary Tab</p>
+    </ng-template>
   </section>
   <section id="company-news-section">
+    <ng-template #newsTab>
+      <p>News Tab</p>
+    </ng-template>
   </section>
   <section id="company-charts-section">
+    <ng-template #chartsTab>
+      <p>Charts Tab</p>
+    </ng-template>
   </section>
   <section id="company-insights-section">
+    <ng-template #insightsTab>
+      <p>Insights Tab</p>
+    </ng-template>
   </section>
 </section>

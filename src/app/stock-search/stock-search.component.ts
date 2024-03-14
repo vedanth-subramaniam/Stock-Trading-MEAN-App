@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import {StockApiService} from "../stock-api.service";
@@ -13,17 +13,18 @@ import {
   switchMap,
   tap
 } from "rxjs";
-import {AsyncPipe, DatePipe, NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
+import {AsyncPipe, DatePipe, NgForOf, NgIf, NgOptimizedImage, NgTemplateOutlet} from "@angular/common";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {auto} from "@popperjs/core";
+import {MatTab, MatTabGroup} from "@angular/material/tabs";
 
 @Component({
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -45,6 +46,14 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   newsResponse!: any;
   chartResponse!: any;
   insightsResponse!: any;
+
+  selectedIndex: number = 0;
+
+  // References to the template elements
+  @ViewChild('summaryTab') summaryTemplate!: TemplateRef<any>;
+  @ViewChild('newsTab') newsTemplate!: TemplateRef<any>;
+  @ViewChild('chartsTab') chartsTemplate!: TemplateRef<any>;
+  @ViewChild('insightsTab') insightsTemplate!: TemplateRef<any>;
 
   constructor(private stockService: StockApiService) {
   }
@@ -104,7 +113,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.stockService.getChartsTabDetailsAPI(this.tickerSymbol).subscribe({
+    this.stockService.getChartsTabDetailsAPI(this.tickerSymbol.toUpperCase()).subscribe({
       next: (response: any) => {
         this.chartResponse = response;
         console.log('Charts Tab Details:', this.chartResponse);
@@ -135,7 +144,27 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
+  selectTab(index: number) {
+    this.selectedIndex = index;
+  }
+
+  getTemplate() {
+    switch (this.selectedIndex) {
+      case 0:
+        return this.summaryTemplate;
+      case 1:
+        return this.newsTemplate;
+      case 2:
+        return this.chartsTemplate;
+      case 3:
+        return this.insightsTemplate;
+      default:
+        return null;
+    }
+  }
+
   protected readonly auto = auto;
+  protected readonly console = console;
 }
 
 interface StockOption {
