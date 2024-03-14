@@ -39,8 +39,3 @@ h1 {
 .list-group li{
   border-bottom: 0 none;
 }
-
-.news-card {
-  max-width: 400px;
-  margin-bottom: 8px;
-}

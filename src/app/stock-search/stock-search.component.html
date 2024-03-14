@@ -94,16 +94,30 @@
     </ng-template>
   </section>
   <section id="company-news-section">
-    <ng-template #newsTab>
-      <div *ngFor="let newsOption of newsResponse">
-        <mat-card class="news-card">
-          <mat-card-content class="d-md-flex">
-            <img class="m-1" mat-card-sm-image [src]="newsOption?.image" [alt]="newsOption?.related">
-            <p class="m-1">{{ newsOption?.headline }}</p>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </ng-template>
+    <div class="container-sm"> <!-- Bootstrap container for responsive alignment -->
+      <ng-template #newsTab>
+        <div class="row"> <!-- Bootstrap row -->
+          <!-- Use a *ngFor directive with an index to iterate over newsResponse and split into rows -->
+          <div *ngFor="let newsOption of newsResponse; let i = index" class="col-md-6 mb-2 mt-2">
+            <!-- Bootstrap column, 'mb-4' for some margin at the bottom -->
+            <mat-card class="m-1 bg-light">
+              <mat-card-content class="d-flex container">
+                <div class="row w-100">
+                  <div class="col-4 d-flex justify-content-center">
+                    <img mat-card-sm-image [src]="newsOption?.image" [alt]="newsOption?.related">
+                  </div>
+                  <div class="col-8 d-flex justify-content-center">
+                    <p>{{ newsOption?.headline }}</p>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+            <!-- Add a clearfix after every second card -->
+            <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-md-block"></div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
   </section>
   <section id="company-charts-section">
     <ng-template #chartsTab>
