@@ -19,12 +19,20 @@ import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {auto} from "@popperjs/core";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {
+  MatCard,
+  MatCardContent,
+  MatCardHeader, MatCardSmImage,
+  MatCardSubtitle,
+  MatCardTitle,
+  MatCardTitleGroup
+} from "@angular/material/card";
 
 @Component({
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'

@@ -95,8 +95,13 @@
   </section>
   <section id="company-news-section">
     <ng-template #newsTab>
-      <div>
-        
+      <div *ngFor="let newsOption of newsResponse">
+        <mat-card class="news-card">
+          <mat-card-content class="d-md-flex">
+            <img class="m-1" mat-card-sm-image [src]="newsOption?.image" [alt]="newsOption?.related">
+            <p class="m-1">{{ newsOption?.headline }}</p>
+          </mat-card-content>
+        </mat-card>
       </div>
     </ng-template>
   </section>
