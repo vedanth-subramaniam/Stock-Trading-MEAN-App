@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
-import {StockApiService} from "../stock-api.service";
 import {
   catchError,
   debounceTime,
@@ -27,6 +26,7 @@ import {
   MatCardTitle,
   MatCardTitleGroup
 } from "@angular/material/card";
+import {StockApiService} from "../../stock-api.service";
 
 @Component({
   selector: 'app-stock-search',

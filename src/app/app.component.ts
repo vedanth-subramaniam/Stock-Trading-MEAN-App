@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
-import {StockWishlistComponent} from "./stock-wishlist/stock-wishlist.component";
-import {StockPortfolioComponent} from "./stock-portfolio/stock-portfolio.component";
-import {StockSearchComponent} from "./stock-search/stock-search.component";
+import {StockWishlistComponent} from "./components/stock-wishlist/stock-wishlist.component";
+import {StockPortfolioComponent} from "./components/stock-portfolio/stock-portfolio.component";
+import {StockSearchComponent} from "./components/stock-search/stock-search.component";
 import {NgIf, NgSwitch} from "@angular/common";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 

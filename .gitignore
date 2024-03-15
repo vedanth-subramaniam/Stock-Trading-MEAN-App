@@ -42,4 +42,4 @@ testem.log
 Thumbs.db
 
 #Custom check
-/src/app/stock-search/responses.json
+/src/app/components/stock-search/responses.json
