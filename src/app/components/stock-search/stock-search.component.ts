@@ -26,7 +26,7 @@ import {
   MatCardTitle,
   MatCardTitleGroup
 } from "@angular/material/card";
-import {StockApiService} from "../../stock-api.service";
+import {StockApiService} from "../../services/stock-api.service";
 
 @Component({
   selector: 'app-stock-search',
