@@ -3,9 +3,10 @@
     <div class="d-md-flex justify-content-center mb-2">
       <h1>STOCK SEARCH</h1>
     </div>
-    <div class="d-md-flex justify-content-center">
-      <div class="input-group mb-3 search-bar">
-        <input matInput type="text" [formControl]="stockSearchControl" class="form-control me-2 border-0 no-outline"
+    <div class="d-md-flex justify-content-center container-md">
+      <div class="input-group mb-3 search-bar row">
+        <input matInput type="text" [formControl]="stockSearchControl"
+               class="form-control me-2 border-0 no-outline col-md-10"
                placeholder="Enter stock ticker symbol" aria-label="Stock ticker symbol" [matAutocomplete]="auto">
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
           @for (option of autocompleteSearchResults; track option) {
@@ -14,7 +15,7 @@
             </mat-option>
           }
         </mat-autocomplete>
-        <div class="input-group-append d-flex">
+        <div class="input-group-append d-flex col-md-2">
           <button class="btn no-outline" type="button" (click)="searchStock()">
             <i class="bi bi-search"></i>
           </button>
@@ -47,12 +48,16 @@
         </div>
         <div>
           <img [src]="stockProfile?.logo">
+          <div>
+            <p *ngIf="getMarketStatus()" class="text-danger">Market is Closed</p>
+            <p *ngIf="!getMarketStatus()" class="text-success">Market is Open</p>
+          </div>
         </div>
         <div>
           <ul class="list-group list-group-flush">
             <li class="list-group">{{ latestPrice?.c }}</li>
             <li class="list-group">{{ latestPrice?.d }}({{ latestPrice?.dp }})</li>
-            <li class="list-group">{{ latestPrice?.t | date }}</li>
+            <li class="list-group">{{ latestPrice?.t * 1000 | date:'medium' }}</li>
           </ul>
         </div>
       </div>
@@ -94,12 +99,10 @@
     </ng-template>
   </section>
   <section id="company-news-section">
-    <div class="container-sm"> <!-- Bootstrap container for responsive alignment -->
+    <div class="container-sm">
       <ng-template #newsTab>
-        <div class="row"> <!-- Bootstrap row -->
-          <!-- Use a *ngFor directive with an index to iterate over newsResponse and split into rows -->
+        <div class="row">
           <div *ngFor="let newsOption of newsResponse; let i = index" class="col-md-6 mb-2 mt-2">
-            <!-- Bootstrap column, 'mb-4' for some margin at the bottom -->
             <mat-card class="m-1 bg-light">
               <mat-card-content class="d-flex container">
                 <div class="row w-100">
@@ -112,7 +115,6 @@
                 </div>
               </mat-card-content>
             </mat-card>
-            <!-- Add a clearfix after every second card -->
             <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-md-block"></div>
           </div>
         </div>

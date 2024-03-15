@@ -173,6 +173,15 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   protected readonly auto = auto;
   protected readonly console = console;
+
+  getMarketStatus() {
+    const currentDate = new Date();
+    const timestampDate = new Date(this.latestPrice?.t * 1000);
+
+    const difference = currentDate.getTime() - timestampDate.getTime();
+
+    return difference > (5 * 60 * 1000);
+  }
 }
 
 interface StockOption {
