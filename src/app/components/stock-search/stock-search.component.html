@@ -103,7 +103,7 @@
       <ng-template #newsTab>
         <div class="row">
           <div *ngFor="let newsOption of newsResponse; let i = index" class="col-md-6 mb-2 mt-2">
-            <mat-card class="m-1 bg-light">
+            <mat-card class="m-1 bg-light" (click)="openDialog(newsOption)">
               <mat-card-content class="d-flex container">
                 <div class="row w-100">
                   <div class="col-4 d-flex justify-content-center">

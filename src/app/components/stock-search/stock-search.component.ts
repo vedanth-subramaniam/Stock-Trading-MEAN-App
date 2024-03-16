@@ -27,6 +27,8 @@ import {
   MatCardTitleGroup
 } from "@angular/material/card";
 import {StockApiService} from "../../services/stock-api.service";
+import {MatDialog} from "@angular/material/dialog";
+import {NewsDetailsDialogComponent} from "../news-details-dialog/news-details-dialog.component";
 
 @Component({
   selector: 'app-stock-search',
@@ -63,12 +65,12 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   @ViewChild('chartsTab') chartsTemplate!: TemplateRef<any>;
   @ViewChild('insightsTab') insightsTemplate!: TemplateRef<any>;
 
-  constructor(private stockService: StockApiService) {
+  constructor(private stockService: StockApiService, public dialog: MatDialog) {
   }
 
   ngOnInit() {
 
-    console.log("Init");
+    console.log("Search component Init");
     this.autocompleteSearchResults = [];
     this.stockSearchControl.valueChanges.pipe(
       debounceTime(700), // Wait for 700ms pause in events
@@ -182,6 +184,14 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     return difference > (5 * 60 * 1000);
   }
+
+  openDialog(newsDetail: any): void {
+    this.dialog.open(NewsDetailsDialogComponent, {
+      width: '250px',
+      data: newsDetail
+    });
+  }
+
 }
 
 interface StockOption {
