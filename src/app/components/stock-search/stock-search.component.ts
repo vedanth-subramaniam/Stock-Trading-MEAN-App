@@ -139,21 +139,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   }
 
-  clearSearch() {
-    console.log("Clear search");
-    this.stockSearchControl.reset();
-    this.tickerSymbol = '';
-    this.autocompleteSearchResults = [];
-    this.subscriptions.unsubscribe();
-    this.currentTab = "";
-  }
-
-  ngOnDestroy() {
-    // Unsubscribe to prevent memory leaks
-    this.autocompleteSearchResults = [];
-    this.subscriptions.unsubscribe();
-  }
-
   selectTab(index: number) {
     this.selectedIndex = index;
   }
@@ -173,9 +158,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected readonly auto = auto;
-  protected readonly console = console;
-
   getMarketStatus() {
     const currentDate = new Date();
     const timestampDate = new Date(this.latestPrice?.t * 1000);
@@ -192,6 +174,23 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     });
   }
 
+  clearSearch() {
+    console.log("Clear search");
+    this.stockSearchControl.reset();
+    this.tickerSymbol = '';
+    this.autocompleteSearchResults = [];
+    this.subscriptions.unsubscribe();
+    this.currentTab = "";
+  }
+
+  ngOnDestroy() {
+    // Unsubscribe to prevent memory leaks
+    this.autocompleteSearchResults = [];
+    this.subscriptions.unsubscribe();
+  }
+
+  protected readonly auto = auto;
+  protected readonly console = console;
 }
 
 interface StockOption {
