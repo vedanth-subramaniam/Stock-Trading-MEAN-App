@@ -83,7 +83,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       this.newsResponse = state.newsResponse;
       this.chartResponse = state.chartResponse;
       this.insightsResponse = state.insightsResponse;
-      this.selectedIndex = state.selectedIndex;
     }
 
     this.autocompleteSearchResults = [];
@@ -205,7 +204,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       newsResponse: this.newsResponse,
       chartResponse: this.chartResponse,
       insightsResponse: this.insightsResponse,
-      selectedIndex: this.selectedIndex,
+      currentTab: this.currentTab
     });
   }
 
