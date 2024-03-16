@@ -29,6 +29,7 @@ import {
 import {StockApiService} from "../../services/stock-api.service";
 import {MatDialog} from "@angular/material/dialog";
 import {NewsDetailsDialogComponent} from "../news-details-dialog/news-details-dialog.component";
+import { StockStateService } from '../../services/stock-state.service';
 
 @Component({
   selector: 'app-stock-search',
@@ -65,12 +66,26 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   @ViewChild('chartsTab') chartsTemplate!: TemplateRef<any>;
   @ViewChild('insightsTab') insightsTemplate!: TemplateRef<any>;
 
-  constructor(private stockService: StockApiService, public dialog: MatDialog) {
+  constructor(private stockService: StockApiService, public dialog: MatDialog, private stockStateService: StockStateService) {
   }
 
   ngOnInit() {
 
     console.log("Search component Init");
+    const state = this.stockStateService.getState();
+    console.log('State:', state);
+    if (state) {
+      this.tickerSymbol = state.tickerSymbol;
+      this.companyInfoResponse = state.companyInfoResponse;
+      this.companyPeers = state.companyPeers;
+      this.latestPrice = state.latestPrice;
+      this.stockProfile = state.stockProfile;
+      this.newsResponse = state.newsResponse;
+      this.chartResponse = state.chartResponse;
+      this.insightsResponse = state.insightsResponse;
+      this.selectedIndex = state.selectedIndex;
+    }
+
     this.autocompleteSearchResults = [];
     this.stockSearchControl.valueChanges.pipe(
       debounceTime(700), // Wait for 700ms pause in events
@@ -109,7 +124,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
             this.stockProfile = this.companyInfoResponse.stockProfile;
             this.latestPrice = this.companyInfoResponse.latestPrice;
             this.companyPeers = this.companyInfoResponse.companyPeers;
-            this.currentTab = "Summary";
+            this.onStateChange();
+            console.log('State changes inside company details', this.stockStateService.getState());
           },
           error => console.error('Error fetching Company Common Details', error)
         ))
@@ -137,6 +153,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.currentTab = "Summary";
+    this.onStateChange();
+    console.log('State changes', this.stockStateService.getState());
   }
 
   selectTab(index: number) {
@@ -174,6 +193,22 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     });
   }
 
+  onStateChange() {
+    // When the state changes, save it to the service
+    console.log("Current tab before saving state", this.currentTab);
+    this.stockStateService.saveState({
+      tickerSymbol: this.tickerSymbol,
+      companyInfoResponse: this.companyInfoResponse,
+      companyPeers: this.companyPeers,
+      latestPrice: this.latestPrice,
+      stockProfile: this.stockProfile,
+      newsResponse: this.newsResponse,
+      chartResponse: this.chartResponse,
+      insightsResponse: this.insightsResponse,
+      selectedIndex: this.selectedIndex,
+    });
+  }
+
   clearSearch() {
     console.log("Clear search");
     this.stockSearchControl.reset();
@@ -185,6 +220,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     // Unsubscribe to prevent memory leaks
+    // this.onStateChange();
     this.autocompleteSearchResults = [];
     this.subscriptions.unsubscribe();
   }
