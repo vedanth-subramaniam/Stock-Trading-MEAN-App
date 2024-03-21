@@ -29,7 +29,7 @@ import {
 import {StockApiService} from "../../services/stock-api.service";
 import {MatDialog} from "@angular/material/dialog";
 import {NewsDetailsDialogComponent} from "../news-details-dialog/news-details-dialog.component";
-import { StockStateService } from '../../services/stock-state.service';
+import {StockStateService} from '../../services/stock-state.service';
 
 @Component({
   selector: 'app-stock-search',
@@ -66,7 +66,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   @ViewChild('chartsTab') chartsTemplate!: TemplateRef<any>;
   @ViewChild('insightsTab') insightsTemplate!: TemplateRef<any>;
 
-  constructor(private stockService: StockApiService, public dialog: MatDialog, private stockStateService: StockStateService) {
+  constructor(private stockService: StockApiService, public dialog: MatDialog, protected stockStateService: StockStateService) {
   }
 
   ngOnInit() {
@@ -83,8 +83,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       this.newsResponse = state.newsResponse;
       this.chartResponse = state.chartResponse;
       this.insightsResponse = state.insightsResponse;
+      this.currentTab = state.currentTab;
+      this.stockSearchControl.setValue(state.searchInputValue);
     }
-
     this.autocompleteSearchResults = [];
     this.stockSearchControl.valueChanges.pipe(
       debounceTime(700), // Wait for 700ms pause in events
@@ -107,9 +108,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     });
   }
 
-  searchStock() {
+  searchStock(searchInput: any) {
 
-    this.tickerSymbol = this.stockSearchControl.value;
+    this.stockSearchControl.setValue(searchInput);
+    this.tickerSymbol = searchInput.toUpperCase();
     console.log('Searching for stock:', this.tickerSymbol);
 
     const apiInterval$ = interval(15000).pipe(startWith(0));
@@ -204,7 +206,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       newsResponse: this.newsResponse,
       chartResponse: this.chartResponse,
       insightsResponse: this.insightsResponse,
-      currentTab: this.currentTab
+      currentTab: this.currentTab,
+      searchInputValue: this.stockSearchControl.value
     });
   }
 

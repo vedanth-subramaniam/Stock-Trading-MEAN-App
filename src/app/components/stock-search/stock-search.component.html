@@ -11,12 +11,12 @@
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
           @for (option of autocompleteSearchResults; track option) {
             <mat-option [value]="option.displaySymbol"
-                        (click)="searchStock()">{{ option.displaySymbol + " | " + option.description }}
+                        (click)="searchStock(stockSearchControl.value)">{{ option.displaySymbol + " | " + option.description }}
             </mat-option>
           }
         </mat-autocomplete>
         <div class="input-group-append d-flex col-md-2">
-          <button class="btn no-outline" type="button" (click)="searchStock()">
+          <button class="btn no-outline" type="button" (click)="searchStock(stockSearchControl.value)">
             <i class="bi bi-search"></i>
           </button>
           <button class="btn border-0" type="button" (click)="clearSearch()">
@@ -47,7 +47,7 @@
           </ul>
         </div>
         <div>
-          <img [src]="stockProfile?.logo">
+          <img class="stock-company-logo" [src]="stockProfile?.logo">
           <div>
             <p *ngIf="getMarketStatus()" class="text-danger">Market is Closed</p>
             <p *ngIf="!getMarketStatus()" class="text-success">Market is Open</p>
@@ -92,7 +92,12 @@
             <p><strong>Industry: </strong>{{ stockProfile?.finnhubIndustry }}</p>
             <p><strong>Webpage: </strong><a href="{{stockProfile?.weburl}}">{{ stockProfile?.weburl }}</a></p>
             <p><strong>Company Peers: </strong></p>
-            <p>{{ companyPeers }}</p>
+            <div class="company-peers-container">
+              <span *ngFor="let company of companyPeers; let isLast=last">
+                    <a href="#"
+                       (click)="searchStock(company); $event.preventDefault()">{{ company }}</a>
+              </span>
+            </div>
           </div>
         </div>
       </div>
