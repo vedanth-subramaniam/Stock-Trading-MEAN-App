@@ -30,12 +30,13 @@ import {StockApiService} from "../../services/stock-api.service";
 import {MatDialog} from "@angular/material/dialog";
 import {NewsDetailsDialogComponent} from "../news-details-dialog/news-details-dialog.component";
 import {StockStateService} from '../../services/stock-state.service';
-
+import {HighchartsChartModule} from "highcharts-angular";
+import * as Highcharts from 'highcharts';
 @Component({
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -59,6 +60,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   insightsResponse!: any;
 
   selectedIndex: number = 0;
+
+  Highcharts: typeof Highcharts = Highcharts;
+  chartOptions: any;
+
 
   // References to the template elements
   @ViewChild('summaryTab') summaryTemplate!: TemplateRef<any>;
@@ -144,6 +149,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         this.chartResponse = response;
         console.log('Charts Tab Details:', this.chartResponse);
+        this.getChartsTabGraph();
       }
     });
 
@@ -192,6 +198,77 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       width: '250px',
       data: newsDetail
     });
+  }
+  getChartsTabGraph() {
+    this.chartOptions = {
+      chart: {
+        type: "area"
+      },
+      title: {
+        text: 'Historic and Estimated Worldwide Population Growth by Region'
+      },
+      subtitle : {
+        text: 'Source: Wikipedia.org'
+      },
+      xAxis:{
+        categories: ['1750', '1800', '1850', '1900', '1950', '1999', '2050'],
+        tickmarkPlacement: 'on',
+        title: {
+          enabled: false
+        }
+      },
+      yAxis : {
+        title: {
+          text: 'Billions'
+        },
+        labels: {
+          // formatter: function () {
+          //   return this.value / 1000;
+          // }
+        }
+      },
+      tooltip : {
+        shared: true,
+        valueSuffix: ' millions'
+      },
+      plotOptions : {
+        area: {
+          stacking: 'normal',
+          lineColor: '#666666',
+          lineWidth: 1,
+
+          marker: {
+            lineWidth: 1,
+            lineColor: '#666666'
+          }
+        }
+      },
+      credits:{
+        enabled: false
+      },
+      series: [
+        {
+          name: 'Asia',
+          data: [502, 635, 809, 947, 1402, 3634, 5268]
+        },
+        {
+          name: 'Africa',
+          data: [106, 107, 111, 133, 221, 767, 1766]
+        },
+        {
+          name: 'Europe',
+          data: [163, 203, 276, 408, 547, 729, 628]
+        },
+        {
+          name: 'America',
+          data: [18, 31, 54, 156, 339, 818, 1201]
+        },
+        {
+          name: 'Oceania',
+          data: [2, 2, 2, 6, 13, 30, 46]
+        }
+      ]
+    };
   }
 
   onStateChange() {

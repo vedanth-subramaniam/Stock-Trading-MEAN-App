@@ -129,6 +129,11 @@
   <section id="company-charts-section">
     <ng-template #chartsTab>
       <p>Charts Tab</p>
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartOptions"
+        style="width: 100%; height: 400px; display: block;"
+      ></highcharts-chart>
     </ng-template>
   </section>
   <section id="company-insights-section">
