@@ -32,6 +32,17 @@ import {NewsDetailsDialogComponent} from "../news-details-dialog/news-details-di
 import {StockStateService} from '../../services/stock-state.service';
 import {HighchartsChartModule} from "highcharts-angular";
 import * as Highcharts from 'highcharts';
+import indicators from 'highcharts/indicators/indicators';
+import volumeByPrice from 'highcharts/indicators/volume-by-price';
+import HC_stock from 'highcharts/modules/stock';
+import indicatorsAll from 'highcharts/indicators/indicators-all'
+import annotations from 'highcharts/'
+
+// Initialize the module
+HC_stock(Highcharts);
+indicatorsAll(Highcharts);
+indicators(Highcharts);
+volumeByPrice(Highcharts);
 @Component({
   selector: 'app-stock-search',
   standalone: true,
@@ -63,7 +74,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: any;
-
+  ohlcCharts: any = [];
+  volumeCharts: any = [];
+  maxVolumeData = Number.MIN_VALUE;
 
   // References to the template elements
   @ViewChild('summaryTab') summaryTemplate!: TemplateRef<any>;
@@ -149,6 +162,22 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         this.chartResponse = response;
         console.log('Charts Tab Details:', this.chartResponse);
+        let jsonData = this.chartResponse.results;
+
+        jsonData.forEach((item: { t: any; c: any; v: any; o: any; h: any; l: any; }) => {
+          let date = item.t;
+          let volume = item.v;
+          let open = item.o;
+          let high = item.h;
+          let low = item.l;
+          let close = item.c;
+          this.ohlcCharts.push([date, open, high, low, close]);
+          this.volumeCharts.push([date, volume]);
+          this.maxVolumeData = Math.max(this.maxVolumeData, volume);
+        });
+        console.log("OHLC DATA", this.ohlcCharts);
+        console.log("Volume data", this.volumeCharts);
+
         this.getChartsTabGraph();
       }
     });
@@ -199,78 +228,106 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       data: newsDetail
     });
   }
+
   getChartsTabGraph() {
+    let groupingUnits = [[
+      'week',                         // unit name
+      [1]                             // allowed multiples
+    ], [
+      'month',
+      [1, 2, 3, 4, 6]
+    ]];
     this.chartOptions = {
       chart: {
-        type: "area"
+        type: 'stock'
       },
-      title: {
-        text: 'Historic and Estimated Worldwide Population Growth by Region'
+      rangeSelector: {
+        selected: 2
       },
-      subtitle : {
-        text: 'Source: Wikipedia.org'
-      },
-      xAxis:{
-        categories: ['1750', '1800', '1850', '1900', '1950', '1999', '2050'],
-        tickmarkPlacement: 'on',
-        title: {
-          enabled: false
-        }
-      },
-      yAxis : {
-        title: {
-          text: 'Billions'
-        },
-        labels: {
-          // formatter: function () {
-          //   return this.value / 1000;
-          // }
-        }
-      },
-      tooltip : {
-        shared: true,
-        valueSuffix: ' millions'
-      },
-      plotOptions : {
-        area: {
-          stacking: 'normal',
-          lineColor: '#666666',
-          lineWidth: 1,
 
-          marker: {
-            lineWidth: 1,
-            lineColor: '#666666'
+      title: {
+        text: 'AAPL Historical'
+      },
+
+      subtitle: {
+        text: 'With SMA and Volume by Price technical indicators'
+      },
+
+      yAxis: [{
+        startOnTick: false,
+        endOnTick: false,
+        labels: {
+          align: 'right',
+          x: -3
+        },
+        title: {
+          text: 'OHLC'
+        },
+        height: '60%',
+        lineWidth: 2,
+        resize: {
+          enabled: true
+        }
+      }, {
+        labels: {
+          align: 'right',
+          x: -3
+        },
+        title: {
+          text: 'Volume'
+        },
+        top: '65%',
+        height: '35%',
+        offset: 0,
+        lineWidth: 2
+      }],
+
+      tooltip: {
+        split: true
+      },
+
+      plotOptions: {
+        series: {
+          dataGrouping: {
+            units: groupingUnits
           }
         }
       },
-      credits:{
-        enabled: false
-      },
-      series: [
-        {
-          name: 'Asia',
-          data: [502, 635, 809, 947, 1402, 3634, 5268]
+
+      series: [{
+        type: 'candlestick',
+        name: 'AAPL',
+        id: 'aapl',
+        zIndex: 2,
+        data: this.ohlcCharts
+      }, {
+        type: 'column',
+        name: 'Volume',
+        id: 'volume',
+        data: this.volumeCharts,
+        yAxis: 1
+      }, {
+        type: 'vbp',
+        linkedTo: 'aapl',
+        params: {
+          volumeSeriesID: 'volume'
         },
-        {
-          name: 'Africa',
-          data: [106, 107, 111, 133, 221, 767, 1766]
+        dataLabels: {
+          enabled: false
         },
-        {
-          name: 'Europe',
-          data: [163, 203, 276, 408, 547, 729, 628]
-        },
-        {
-          name: 'America',
-          data: [18, 31, 54, 156, 339, 818, 1201]
-        },
-        {
-          name: 'Oceania',
-          data: [2, 2, 2, 6, 13, 30, 46]
+        zoneLines: {
+          enabled: false
         }
-      ]
+      }, {
+        type: 'sma',
+        linkedTo: 'aapl',
+        zIndex: 1,
+        marker: {
+          enabled: false
+        }
+      }]
     };
   }
-
   onStateChange() {
     // When the state changes, save it to the service
     console.log("Current tab before saving state", this.currentTab);
