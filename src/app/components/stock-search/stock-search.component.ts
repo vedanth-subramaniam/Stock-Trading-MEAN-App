@@ -163,7 +163,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         this.chartResponse = response;
         console.log('Charts Tab Details:', this.chartResponse);
         let jsonData = this.chartResponse.results;
-
+        let tempOhlcCharts:any = [];
+        let tempVolumeCharts: any = [];
         jsonData.forEach((item: { t: any; c: any; v: any; o: any; h: any; l: any; }) => {
           let date = item.t;
           let volume = item.v;
@@ -171,14 +172,17 @@ export class StockSearchComponent implements OnInit, OnDestroy {
           let high = item.h;
           let low = item.l;
           let close = item.c;
-          this.ohlcCharts.push([date, open, high, low, close]);
-          this.volumeCharts.push([date, volume]);
+
+          tempOhlcCharts.push([date, open, high, low, close]);
+          tempVolumeCharts.push([date, volume]);
           this.maxVolumeData = Math.max(this.maxVolumeData, volume);
         });
+        this.ohlcCharts = [...tempOhlcCharts];
+        this.volumeCharts = [...tempVolumeCharts];
+
         console.log("OHLC DATA", this.ohlcCharts);
         console.log("Volume data", this.volumeCharts);
-
-        this.getChartsTabGraph();
+        this.getChartsTabGraph(this.ohlcCharts, this.volumeCharts);
       }
     });
 
@@ -229,10 +233,12 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     });
   }
 
-  getChartsTabGraph() {
+  getChartsTabGraph(ohlc: any, volume: any) {
+
+    console.log("Charts options");
     let groupingUnits = [[
-      'week',                         // unit name
-      [1]                             // allowed multiples
+      'day',
+      [1]
     ], [
       'month',
       [1, 2, 3, 4, 6]
@@ -246,7 +252,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       },
 
       title: {
-        text: 'AAPL Historical'
+        text: this.chartResponse.ticker + ' Historical'
       },
 
       subtitle: {
@@ -296,19 +302,19 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
       series: [{
         type: 'candlestick',
-        name: 'AAPL',
-        id: 'aapl',
+        name: this.chartResponse.ticker,
+        id: this.chartResponse.ticker.toLowerCase(),
         zIndex: 2,
-        data: this.ohlcCharts
+        data: ohlc
       }, {
         type: 'column',
         name: 'Volume',
         id: 'volume',
-        data: this.volumeCharts,
+        data: volume,
         yAxis: 1
       }, {
         type: 'vbp',
-        linkedTo: 'aapl',
+        linkedTo: this.chartResponse.ticker.toLowerCase(),
         params: {
           volumeSeriesID: 'volume'
         },
@@ -320,13 +326,15 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         }
       }, {
         type: 'sma',
-        linkedTo: 'aapl',
+        linkedTo: this.chartResponse.ticker.toLowerCase(),
         zIndex: 1,
         marker: {
           enabled: false
         }
       }]
     };
+    console.log("Value of chartoptions");
+    console.log(this.chartOptions);
   }
   onStateChange() {
     // When the state changes, save it to the service
