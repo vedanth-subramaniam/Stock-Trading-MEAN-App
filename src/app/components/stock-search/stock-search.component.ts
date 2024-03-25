@@ -30,12 +30,24 @@ import {StockApiService} from "../../services/stock-api.service";
 import {MatDialog} from "@angular/material/dialog";
 import {NewsDetailsDialogComponent} from "../news-details-dialog/news-details-dialog.component";
 import {StockStateService} from '../../services/stock-state.service';
+import {HighchartsChartModule} from "highcharts-angular";
+import * as Highcharts from 'highcharts';
+import indicators from 'highcharts/indicators/indicators';
+import volumeByPrice from 'highcharts/indicators/volume-by-price';
+import HC_stock from 'highcharts/modules/stock';
+import indicatorsAll from 'highcharts/indicators/indicators-all'
+import annotations from 'highcharts/'
 
+// Initialize the module
+HC_stock(Highcharts);
+indicatorsAll(Highcharts);
+indicators(Highcharts);
+volumeByPrice(Highcharts);
 @Component({
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -59,6 +71,12 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   insightsResponse!: any;
 
   selectedIndex: number = 0;
+
+  Highcharts: typeof Highcharts = Highcharts;
+  chartOptions: any;
+  ohlcCharts: any = [];
+  volumeCharts: any = [];
+  maxVolumeData = Number.MIN_VALUE;
 
   // References to the template elements
   @ViewChild('summaryTab') summaryTemplate!: TemplateRef<any>;
@@ -144,6 +162,27 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         this.chartResponse = response;
         console.log('Charts Tab Details:', this.chartResponse);
+        let jsonData = this.chartResponse.results;
+        let tempOhlcCharts:any = [];
+        let tempVolumeCharts: any = [];
+        jsonData.forEach((item: { t: any; c: any; v: any; o: any; h: any; l: any; }) => {
+          let date = item.t;
+          let volume = item.v;
+          let open = item.o;
+          let high = item.h;
+          let low = item.l;
+          let close = item.c;
+
+          tempOhlcCharts.push([date, open, high, low, close]);
+          tempVolumeCharts.push([date, volume]);
+          this.maxVolumeData = Math.max(this.maxVolumeData, volume);
+        });
+        this.ohlcCharts = [...tempOhlcCharts];
+        this.volumeCharts = [...tempVolumeCharts];
+
+        console.log("OHLC DATA", this.ohlcCharts);
+        console.log("Volume data", this.volumeCharts);
+        this.getChartsTabGraph(this.ohlcCharts, this.volumeCharts);
       }
     });
 
@@ -194,6 +233,109 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     });
   }
 
+  getChartsTabGraph(ohlc: any, volume: any) {
+
+    console.log("Charts options");
+    let groupingUnits = [[
+      'day',
+      [1]
+    ], [
+      'month',
+      [1, 2, 3, 4, 6]
+    ]];
+    this.chartOptions = {
+      chart: {
+        type: 'stock'
+      },
+      rangeSelector: {
+        selected: 2
+      },
+
+      title: {
+        text: this.chartResponse.ticker + ' Historical'
+      },
+
+      subtitle: {
+        text: 'With SMA and Volume by Price technical indicators'
+      },
+
+      yAxis: [{
+        startOnTick: false,
+        endOnTick: false,
+        labels: {
+          align: 'right',
+          x: -3
+        },
+        title: {
+          text: 'OHLC'
+        },
+        height: '60%',
+        lineWidth: 2,
+        resize: {
+          enabled: true
+        }
+      }, {
+        labels: {
+          align: 'right',
+          x: -3
+        },
+        title: {
+          text: 'Volume'
+        },
+        top: '65%',
+        height: '35%',
+        offset: 0,
+        lineWidth: 2
+      }],
+
+      tooltip: {
+        split: true
+      },
+
+      plotOptions: {
+        series: {
+          dataGrouping: {
+            units: groupingUnits
+          }
+        }
+      },
+
+      series: [{
+        type: 'candlestick',
+        name: this.chartResponse.ticker,
+        id: this.chartResponse.ticker.toLowerCase(),
+        zIndex: 2,
+        data: ohlc
+      }, {
+        type: 'column',
+        name: 'Volume',
+        id: 'volume',
+        data: volume,
+        yAxis: 1
+      }, {
+        type: 'vbp',
+        linkedTo: this.chartResponse.ticker.toLowerCase(),
+        params: {
+          volumeSeriesID: 'volume'
+        },
+        dataLabels: {
+          enabled: false
+        },
+        zoneLines: {
+          enabled: false
+        }
+      }, {
+        type: 'sma',
+        linkedTo: this.chartResponse.ticker.toLowerCase(),
+        zIndex: 1,
+        marker: {
+          enabled: false
+        }
+      }]
+    };
+    console.log("Value of chartoptions");
+    console.log(this.chartOptions);
+  }
   onStateChange() {
     // When the state changes, save it to the service
     console.log("Current tab before saving state", this.currentTab);
