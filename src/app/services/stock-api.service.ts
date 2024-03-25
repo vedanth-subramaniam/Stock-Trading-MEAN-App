@@ -17,6 +17,9 @@ export class StockApiService {
     return this.http.get("http://localhost:3000/search/" + stockTicker);
   }
 
+  getChartsHourlyDetailsAPI(stockTicker: any) {
+    return this.http.get("http://localhost:3000/chartsHourly/" + stockTicker);
+  }
   getNewsTabDetailsAPI(stockTicker: any) {
     return this.http.get("http://localhost:3000/news/" + stockTicker);
   }

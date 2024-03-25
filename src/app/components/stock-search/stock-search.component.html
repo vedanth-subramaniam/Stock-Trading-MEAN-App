@@ -98,6 +98,13 @@
                        (click)="searchStock(company); $event.preventDefault()">{{ company }}</a>
               </span>
             </div>
+            <div class="company-hourly-charts-container">
+              <highcharts-chart
+                [Highcharts]="Highcharts"
+                [options]="chartOptionsSummary"
+                style="width: 50%; height: 400px; display: block;">
+              </highcharts-chart>
+            </div>
           </div>
         </div>
       </div>

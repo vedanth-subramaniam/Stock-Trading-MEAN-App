@@ -36,13 +36,13 @@ import indicators from 'highcharts/indicators/indicators';
 import volumeByPrice from 'highcharts/indicators/volume-by-price';
 import HC_stock from 'highcharts/modules/stock';
 import indicatorsAll from 'highcharts/indicators/indicators-all'
-import annotations from 'highcharts/'
 
 // Initialize the module
 HC_stock(Highcharts);
 indicatorsAll(Highcharts);
 indicators(Highcharts);
 volumeByPrice(Highcharts);
+
 @Component({
   selector: 'app-stock-search',
   standalone: true,
@@ -78,6 +78,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   volumeCharts: any = [];
   maxVolumeData = Number.MIN_VALUE;
 
+  chartOptionsSummary: any;
+  chartsHourlyResponse: any;
+  chartsHourlyDataList: any;
   // References to the template elements
   @ViewChild('summaryTab') summaryTemplate!: TemplateRef<any>;
   @ViewChild('newsTab') newsTemplate!: TemplateRef<any>;
@@ -151,6 +154,16 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       ).subscribe()
     );
 
+    this.stockService.getChartsHourlyDetailsAPI(this.tickerSymbol).subscribe({
+      next: (response) => {
+        this.chartsHourlyResponse = response;
+        this.chartsHourlyDataList = this.chartsHourlyResponse.results;
+        console.log("Charts Hourly Data");
+        console.log(this.chartsHourlyDataList);
+        this.getHourlyChartsOptions();
+      }
+    })
+
     this.stockService.getNewsTabDetailsAPI(this.tickerSymbol).subscribe({
       next: (response: any) => {
         this.newsResponse = response;
@@ -163,7 +176,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         this.chartResponse = response;
         console.log('Charts Tab Details:', this.chartResponse);
         let jsonData = this.chartResponse.results;
-        let tempOhlcCharts:any = [];
+        let tempOhlcCharts: any = [];
         let tempVolumeCharts: any = [];
         jsonData.forEach((item: { t: any; c: any; v: any; o: any; h: any; l: any; }) => {
           let date = item.t;
@@ -336,6 +349,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Value of chartoptions");
     console.log(this.chartOptions);
   }
+
   onStateChange() {
     // When the state changes, save it to the service
     console.log("Current tab before saving state", this.currentTab);
@@ -351,6 +365,40 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       currentTab: this.currentTab,
       searchInputValue: this.stockSearchControl.value
     });
+  }
+
+  getHourlyChartsOptions() {
+
+    let stockPriceData = this.chartsHourlyDataList.map((item: any) => [item.t, item.o]);
+
+    this.chartOptionsSummary = {
+      chart: {
+        type: 'line'
+      },
+      title: {
+        text: 'AAPL Hourly Price Variation'
+      },
+      xAxis: {
+        type: 'datetime',
+        dateTimeLabelFormats: { // don't display the dummy year
+          month: '%e. %b',
+          year: '%b'
+        },
+        title: {
+          text: 'Date'
+        }
+      },
+      yAxis: {
+        title: {
+          text: 'Price (USD)'
+        }
+      },
+      series: [{
+        name: this.chartsHourlyResponse.ticker + ' Stock Price',
+        data: stockPriceData // data should be filled in here
+      }]
+      // other chart options
+    };
   }
 
   clearSearch() {
