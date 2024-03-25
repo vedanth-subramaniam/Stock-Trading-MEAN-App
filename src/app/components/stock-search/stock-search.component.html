@@ -28,10 +28,8 @@
   </div>
 </section>
 <section #searchPageContents>
-  <!--  <div class="d-md-flex">-->
   <div *ngIf="(currentTab == 'Summary') then companyInfo">
   </div>
-  <!--  </div>-->
   <section id="common-company-info-section">
     <ng-template #companyInfo>
       <div class="d-md-flex justify-content-md-evenly company-info-card">
@@ -76,36 +74,38 @@
     <ng-template #summaryTab>
       <div>
         <div>
-          <ul class="list-group">
-            <li class="list-group-item">High Price : {{ latestPrice?.h }}</li>
-            <li class="list-group-item">Low Price: {{ latestPrice?.l }}</li>
-            <li class="list-group-item">Open Price: {{ latestPrice?.o }}</li>
-            <li class="list-group-item">Prev. Close: {{ latestPrice?.pc }}</li>
-          </ul>
-        </div>
-        <div>
           <div>
-            <p><strong>About the company</strong></p>
+            <ul class="list-group">
+              <li class="list-group-item">High Price : {{ latestPrice?.h }}</li>
+              <li class="list-group-item">Low Price: {{ latestPrice?.l }}</li>
+              <li class="list-group-item">Open Price: {{ latestPrice?.o }}</li>
+              <li class="list-group-item">Prev. Close: {{ latestPrice?.pc }}</li>
+            </ul>
           </div>
           <div>
-            <p><strong>IPO Start Date: </strong>{{ stockProfile?.ipo }}</p>
-            <p><strong>Industry: </strong>{{ stockProfile?.finnhubIndustry }}</p>
-            <p><strong>Webpage: </strong><a href="{{stockProfile?.weburl}}">{{ stockProfile?.weburl }}</a></p>
-            <p><strong>Company Peers: </strong></p>
-            <div class="company-peers-container">
+            <div>
+              <p><strong>About the company</strong></p>
+            </div>
+            <div>
+              <p><strong>IPO Start Date: </strong>{{ stockProfile?.ipo }}</p>
+              <p><strong>Industry: </strong>{{ stockProfile?.finnhubIndustry }}</p>
+              <p><strong>Webpage: </strong><a href="{{stockProfile?.weburl}}">{{ stockProfile?.weburl }}</a></p>
+              <p><strong>Company Peers: </strong></p>
+              <div class="company-peers-container">
               <span *ngFor="let company of companyPeers; let isLast=last">
                     <a href="#"
                        (click)="searchStock(company); $event.preventDefault()">{{ company }}</a>
               </span>
-            </div>
-            <div class="company-hourly-charts-container">
-              <highcharts-chart
-                [Highcharts]="Highcharts"
-                [options]="chartOptionsSummary"
-                style="width: 50%; height: 400px; display: block;">
-              </highcharts-chart>
+              </div>
             </div>
           </div>
+        </div>
+        <div class="company-hourly-charts-container">
+          <highcharts-chart
+            [Highcharts]="Highcharts"
+            [options]="chartOptionsSummary"
+            style="width: 50%; height: 400px; display: block;">
+          </highcharts-chart>
         </div>
       </div>
     </ng-template>

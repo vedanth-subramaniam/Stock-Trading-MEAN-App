@@ -7,6 +7,7 @@ import {
   MatDialogTitle
 } from "@angular/material/dialog";
 import {MatAnchor, MatButton} from "@angular/material/button";
+import {DatePipe} from "@angular/common";
 
 @Component({
   selector: 'app-news-details-dialog',
@@ -17,13 +18,14 @@ import {MatAnchor, MatButton} from "@angular/material/button";
     MatAnchor,
     MatButton,
     MatDialogClose,
-    MatDialogTitle
+    MatDialogTitle,
+    DatePipe
   ],
   templateUrl: './news-details-dialog.component.html',
   styleUrl: './news-details-dialog.component.css'
 })
 export class NewsDetailsDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+    console.log("Dialog data", data)
   }
-
 }

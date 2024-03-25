@@ -27,7 +27,7 @@ import {
   MatCardTitleGroup
 } from "@angular/material/card";
 import {StockApiService} from "../../services/stock-api.service";
-import {MatDialog} from "@angular/material/dialog";
+import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {NewsDetailsDialogComponent} from "../news-details-dialog/news-details-dialog.component";
 import {StockStateService} from '../../services/stock-state.service';
 import {HighchartsChartModule} from "highcharts-angular";
@@ -130,9 +130,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   searchStock(searchInput: any) {
-
     this.stockSearchControl.setValue(searchInput);
     this.tickerSymbol = searchInput.toUpperCase();
+    this.currentTab = "";
     console.log('Searching for stock:', this.tickerSymbol);
 
     const apiInterval$ = interval(15000).pipe(startWith(0));
@@ -142,11 +142,16 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         tap(() => this.stockService.getCompanyCommonDetailsAPI(this.tickerSymbol).subscribe(
           (response) => {
             this.companyInfoResponse = response;
+            if(this.companyInfoResponse.companyPeers.length == 0) {
+              console.log("Empty");
+              this.currentTab = "";
+            }
             console.log('Company Common Details:', this.companyInfoResponse);
             this.stockProfile = this.companyInfoResponse.stockProfile;
             this.latestPrice = this.companyInfoResponse.latestPrice;
             this.companyPeers = this.companyInfoResponse.companyPeers;
             this.onStateChange();
+            this.currentTab = "Summary";
             console.log('State changes inside company details', this.stockStateService.getState());
           },
           error => console.error('Error fetching Company Common Details', error)
@@ -206,7 +211,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.currentTab = "Summary";
+    // this.currentTab = "Summary";
     this.onStateChange();
     console.log('State changes', this.stockStateService.getState());
   }
@@ -240,10 +245,19 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   openDialog(newsDetail: any): void {
-    this.dialog.open(NewsDetailsDialogComponent, {
-      width: '250px',
-      data: newsDetail
-    });
+
+    const dialogConfig = new MatDialogConfig();
+
+    // Set the position of the dialog
+    dialogConfig.position = {top: '2%'}; // You can adjust '0' to another value to suit your needs
+    // Add other configuration settings as needed, like width, height, etc.
+    dialogConfig.width = '500px';
+    dialogConfig.height = '400px';
+
+    // If you want to add custom classes for styling, use the panelClass property
+    dialogConfig.panelClass = 'my-custom-dialog';
+    dialogConfig.data = newsDetail;
+    this.dialog.open(NewsDetailsDialogComponent, dialogConfig);
   }
 
   getChartsTabGraph(ohlc: any, volume: any) {
