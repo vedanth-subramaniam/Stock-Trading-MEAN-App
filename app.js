@@ -349,15 +349,16 @@ app.get('/getAllStocks', async function (req, res) {
     }
 });
 
-app.delete('/deleteStock/:stockTicker', async function (req, res) {
+app.get('/deleteStockFromWishlist/:stockTicker', async function (req, res) {
     try {
+        console.log("Delete API");
         await client.connect();
         const dbName = "StockAssignment";
         const collectionName = "StockWishlist";
         const database = client.db(dbName);
         const collection = database.collection(collectionName);
         const stockTickerSymbol = req.params.stockTicker;
-        const result = await collection.deleteOne({ stockTicker: stockTickerSymbol });
+        const result = await collection.deleteOne({ ticker: stockTickerSymbol });
         if (result.deletedCount === 1) {
             res.send("Stock deleted successfully");
         } else {
