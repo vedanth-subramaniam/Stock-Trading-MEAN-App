@@ -1,19 +1,38 @@
 .navbar-nav .nav-link {
   border-radius: 0.8rem;
-transition: color 0.2s, background-color 0.2s, border 0.2s;
+  transition: color 0.2s, background-color 0.2s, border 0.2s;
 
-&.active {
-  color: #eee4e4;
-/*background-color: rgba(245, 245, 245, 0.25);*/
-border: 1px solid #eae1e1;
-}
+  &.active {
+    color: #eee4e4;
+    /*background-color: rgba(245, 245, 245, 0.25);*/
+    border: 1px solid #eae1e1;
+  }
 
   &:not(.active):hover {
     color: #faf6f6;
-  background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
   }
 }
-nav.navbar{
+
+nav.navbar {
   background-color: darkblue;
   font-family: sans-serif;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+footer {
+  /* Add any specific styles for your footer here */
 }
