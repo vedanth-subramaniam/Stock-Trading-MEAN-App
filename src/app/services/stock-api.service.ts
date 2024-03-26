@@ -21,6 +21,7 @@ export class StockApiService {
   getChartsHourlyDetailsAPI(stockTicker: any) {
     return this.http.get("http://localhost:3000/chartsHourly/" + stockTicker);
   }
+
   getNewsTabDetailsAPI(stockTicker: any) {
     return this.http.get("http://localhost:3000/news/" + stockTicker);
   }
@@ -33,33 +34,32 @@ export class StockApiService {
     return this.http.get("http://localhost:3000/insights/" + stockTicker)
   }
 
-  getAllFromWishlistDB():Observable<any>{
-    const stockData = {
-      "stocks": [
-        {
-          "ticker": "GOOGL",
-          "companyName": "Alphabet Inc",
-          "currentPrice": 140.52,
-          "change": {
-            "amount": 2.25,
-            "percentage": 1.58
-          }
-        },
-        {
-          "ticker": "MSFT",
-          "companyName": "Microsoft Corp",
-          "currentPrice": 404.06,
-          "change": {
-            "amount": -2.50,
-            "percentage": -0.61
-          }
-        }
-      ]
-    };
-    return of(stockData);
+  getLatestStockPrice(stockTicker: any) {
+    return this.http.get("http://localhost:3000/latestPrice/" + stockTicker);
   }
 
+  getAllFromWishlistDB(): Observable<any> {
+    return this.http.get("http://localhost:3000/getAllStocks");
+  }
 
+  postIntoWishListData() {
+    let stockData1 = {
+      "ticker": "TSLA",
+      "companyName": "TSLA Corp",
+      "currentPrice": 404.06,
+      "change": {
+        "amount": -2.50,
+        "percentage": -0.61
+      }
+    }
+    return this.http.post("http://localhost:3000/insertWishlist", stockData1);
+  }
+
+  deleteFromWishlistDB(stockTicker: any){
+    console.log("Delete api in service");
+    console.log(stockTicker);
+    return this.http.get("http://localhost:3000/deleteStockFromWishlist/" + stockTicker);
+  }
 }
 
 

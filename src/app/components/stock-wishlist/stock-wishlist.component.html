@@ -1,8 +1,8 @@
 <div class="container-md w-75">
   <div class="m-2">
-    <div *ngFor="let stock of stocks" class="stock-card">
+    <div *ngFor="let stock of stocks; let i = index" class="stock-card">
       <div class="stock-delete">
-        <span class="close-button" (click)="deleteStock()">&times;</span>
+        <span class="close-button" (click)="deleteStock(stock._id, stock.ticker, i)">&times;</span>
       </div>
       <div class="container-md">
         <div class="stock-header">
