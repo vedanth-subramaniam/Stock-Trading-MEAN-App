@@ -1,16 +1,20 @@
 <div class="news-dialog-box">
   <div>
     <div>
-    <h2 mat-dialog-title>{{ data?.source }}</h2>
-    <h4 class="p-5">{{ data?.datetime * 1000 | date:'longDate' }}</h4>
+      <h2 mat-dialog-title>{{ data?.source }}</h2>
+      <h4 class="p-2 me-1">{{ data?.datetime * 1000 | date:'longDate' }}</h4>
     </div>
     <mat-dialog-content class="mat-typography">
       <p><strong>{{ data?.headline }}</strong></p>
       <p>{{ data?.summary }}</p>
-      <p>For more details click <a href="{{data.url}}">here</a></p>
+      <p>For more details click <a href="{{data.url}}" target="_blank">here</a></p>
     </mat-dialog-content>
     <mat-dialog-actions>
-      <a mat-button href="www.x.com" target="_blank">X</a>
+      <span><i class="bi bi-x" href="www.x.com"><a class="twitter-share-button"
+                                                   href="https://twitter.com/intent/tweet">
+Tweet</a></i></span>
+      <span><i class="fa-brands fa-square-facebook" href="www.facebook.com"></i></span>
+      <!--      <a mat-button href="www.x.com" target="_blank">X</a>-->
       <a mat-button href="www.facebook.com" target="_blank">Facebook</a>
     </mat-dialog-actions>
   </div>
