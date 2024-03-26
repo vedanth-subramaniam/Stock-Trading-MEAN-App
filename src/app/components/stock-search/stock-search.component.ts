@@ -77,7 +77,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   ohlcCharts: any = [];
   volumeCharts: any = [];
   maxVolumeData = Number.MIN_VALUE;
-
+  errorMessage: boolean = false;
   chartOptionsSummary: any;
   chartsHourlyResponse: any;
   chartsHourlyDataList: any;
@@ -133,6 +133,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     this.stockSearchControl.setValue(searchInput);
     this.tickerSymbol = searchInput.toUpperCase();
     this.currentTab = "";
+    this.errorMessage = false;
     console.log('Searching for stock:', this.tickerSymbol);
 
     const apiInterval$ = interval(15000).pipe(startWith(0));
@@ -142,16 +143,17 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         tap(() => this.stockService.getCompanyCommonDetailsAPI(this.tickerSymbol).subscribe(
           (response) => {
             this.companyInfoResponse = response;
-            if(this.companyInfoResponse.companyPeers.length == 0) {
-              console.log("Empty");
-              this.currentTab = "";
-            }
             console.log('Company Common Details:', this.companyInfoResponse);
             this.stockProfile = this.companyInfoResponse.stockProfile;
             this.latestPrice = this.companyInfoResponse.latestPrice;
             this.companyPeers = this.companyInfoResponse.companyPeers;
             this.onStateChange();
             this.currentTab = "Summary";
+            if (this.companyInfoResponse.companyPeers.length == 0) {
+              console.log("Empty");
+              this.currentTab = "";
+              this.errorMessage = true;
+            }
             console.log('State changes inside company details', this.stockStateService.getState());
           },
           error => console.error('Error fetching Company Common Details', error)
@@ -422,11 +424,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     this.autocompleteSearchResults = [];
     this.subscriptions.unsubscribe();
     this.currentTab = "";
+    this.errorMessage = false;
   }
 
   ngOnDestroy() {
-    // Unsubscribe to prevent memory leaks
-    // this.onStateChange();
     this.autocompleteSearchResults = [];
     this.subscriptions.unsubscribe();
   }

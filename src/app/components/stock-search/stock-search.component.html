@@ -26,6 +26,9 @@
       </div>
     </div>
   </div>
+  <div *ngIf="errorMessage">
+    <h1>ERROR NO SEARCH RESULTS PRESENT</h1>
+  </div>
 </section>
 <section #searchPageContents>
   <div *ngIf="(currentTab == 'Summary') then companyInfo">
