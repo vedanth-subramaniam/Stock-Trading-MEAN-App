@@ -447,7 +447,38 @@ app.get('/deleteFromPortfolio/:stockTicker', async function (req, res) {
 });
 
 
+app.get('/wallet', async function (req, res) {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "WalletBalance";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const walletData = await collection.findOne();
+        res.send(walletData);
+    } catch (error) {
+        console.error('Error fetching wallet data:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/updateWalletBalance', async function (req, res) {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "WalletBalance";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const newBalance = req.body.balance;
+        await collection.updateOne({}, { $set: { balance: newBalance } });
+        res.send("Wallet balance updated");
+    } catch (error) {
+        console.error('Error updating wallet balance:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 app.listen('3000', () => {
     console.log(`Server is running on port 3000`);
+    run().catch(console.dir);
 });
