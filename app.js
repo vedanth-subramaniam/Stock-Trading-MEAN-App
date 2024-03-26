@@ -8,11 +8,11 @@ const uri = "mongodb+srv://vedanth1112:Masonmount3900@assignment-3-cluster.b3ibt
 app.use(express.json());
 
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 });
 
 app.use(cors());
@@ -63,26 +63,26 @@ app.get('/search/:stockTicker', async function (req, res) {
 });
 
 app.get('/latestPrice/:stockTicker', async function (req, res) {
-    
-        const stockTickerSymbol = req.params.stockTicker;
-    
-        try {
-            const latestPriceResponse = await axios.get('https://finnhub.io/api/v1/quote', {
-                params: {
-                    token: API_KEY,
-                    symbol: stockTickerSymbol
-                }
-            });
-    
-            if (!latestPriceResponse.data) {
-                return res.status(400).json({ error: 'Latest price not found. Please check stock ticker symbol again.' });
+
+    const stockTickerSymbol = req.params.stockTicker;
+
+    try {
+        const latestPriceResponse = await axios.get('https://finnhub.io/api/v1/quote', {
+            params: {
+                token: API_KEY,
+                symbol: stockTickerSymbol
             }
-    
-            res.send(latestPriceResponse.data);
-    
-        } catch (error) {
-            res.status(500).json({ error: 'Something went wrong' });
+        });
+
+        if (!latestPriceResponse.data) {
+            return res.status(400).json({ error: 'Latest price not found. Please check stock ticker symbol again.' });
         }
+
+        res.send(latestPriceResponse.data);
+
+    } catch (error) {
+        res.status(500).json({ error: 'Something went wrong' });
+    }
 });
 
 app.get('/chartsHourly/:stockTicker', async function (req, res) {
@@ -92,17 +92,17 @@ app.get('/chartsHourly/:stockTicker', async function (req, res) {
     try {
         const multiplier = 1;
         const timespan = 'hour';
-        
+
 
         const to_date = new Date(new Date() - 24 * 60 * 60 * 1000); // 1 day ago
         const from_date = new Date(to_date - 48 * 60 * 60 * 1000); // 24 hours ago
-        
+
         console.log("To date is:", to_date);
         console.log("From date is:", from_date);
 
         const to_date_str = to_date.toISOString().split('T')[0];
         const from_date_str = from_date.toISOString().split('T')[0];
-        
+
         const api_url = `https://api.polygon.io/v2/aggs/ticker/${stockTickerSymbol}/range/${multiplier}/${timespan}/${from_date_str}/${to_date_str}?adjusted=true&sort=asc&apiKey=mwjPq5ceMqn18edHgYpUrK5ZgBul4p2v`;
         console.log(api_url);
         const response = await axios.get(api_url);
@@ -281,18 +281,18 @@ function convertTimestampToPST(response) {
 }
 
 async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    // List the available databases
-    const databases = await client.db().admin().listDatabases();
-    console.log("Available databases:", databases);
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
+    try {
+        // Connect the client to the server	(optional starting in v4.7)
+        await client.connect();
+        // Send a ping to confirm a successful connection
+        await client.db("admin").command({ ping: 1 });
+        // List the available databases
+        const databases = await client.db().admin().listDatabases();
+        console.log("Available databases:", databases);
+    } finally {
+        // Ensures that the client will close when you finish/error
+        await client.close();
+    }
 }
 
 app.post('/insertStockWishlist', async function (req, res) {
@@ -369,6 +369,84 @@ app.get('/deleteStockFromWishlist/:stockTicker', async function (req, res) {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.post('/insertIntoPortfolio', async (req, res) => {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "StockPortfolio";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const stockTickerSymbol = req.body.ticker;
+        const existingRecord = await collection.findOne({ ticker: stockTickerSymbol });
+        if (existingRecord) {
+            const result = await collection.updateOne({ ticker: stockTickerSymbol }, { $set: req.body });
+            res.status(200).send(`Document updated with _id: ${existingRecord._id}`);
+        } else {
+            const result = await collection.insertOne(req.body);
+            res.status(201).send(`Document inserted with _id: ${result.insertedId}`);
+        }
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
+});
+
+app.get('/getAllPortfolioData', async function (req, res) {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "StockPortfolio";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const portfolioData = await collection.find().toArray();
+        res.send(portfolioData);
+    } catch (error) {
+        console.error('Error fetching portfolio data:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/getPortfolioData/:stockTicker', async function (req, res) {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "StockPortfolio";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const stockTickerSymbol = req.params.stockTicker;
+        const portfolioData = await collection.findOne({ ticker: stockTickerSymbol });
+        if (portfolioData) {
+            res.send(portfolioData);
+        } else {
+            res.status(404).json({ error: 'Portfolio data not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching portfolio data:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/deleteFromPortfolio/:stockTicker', async function (req, res) {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "StockPortfolio";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const stockTickerSymbol = req.params.stockTicker;
+        const result = await collection.deleteOne({ ticker: stockTickerSymbol });
+        if (result.deletedCount === 1) {
+            res.send("Stock deleted from portfolio");
+        } else {
+            res.status(404).json({ error: 'Stock not found in portfolio' });
+        }
+    } catch (error) {
+        console.error('Error deleting stock from portfolio:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 
 app.listen('3000', () => {
     console.log(`Server is running on port 3000`);
