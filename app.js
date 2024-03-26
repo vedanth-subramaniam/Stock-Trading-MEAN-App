@@ -2,14 +2,11 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const axios = require('axios');
-const API_KEY = process.env.API_KEY;
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://vedanth1112:Masonmount3900@assignment-3-cluster.b3ibtuy.mongodb.net/?retryWrites=true&w=majority&appName=Assignment-3-Cluster";
 
 app.use(express.json());
-require('dotenv').config();
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -19,10 +16,13 @@ const client = new MongoClient(uri, {
 });
 
 app.use(cors());
+require('dotenv').config();
+const API_KEY = process.env.API_KEY;
 app.get('/search/:stockTicker', async function (req, res) {
 
+    console.log("Search API");
     const stockTickerSymbol = req.params.stockTicker;
-
+    console.log(process.env.API_KEY)
     try {
         const stockProfileResponse = await axios.get('https://finnhub.io/api/v1/stock/profile2', {
             params: {
@@ -45,10 +45,7 @@ app.get('/search/:stockTicker', async function (req, res) {
             }
         });
 
-        // Charts API to fetch past 6 hours data and plot it
-
-        // const chartPointResponse = await axios.get('')
-
+        console.log("Stock profile response is:", stockProfileResponse.data);
         let combinedStockTabResponse = {
             stockProfile: stockProfileResponse.data,
             latestPrice: latestPriceResponse.data,
@@ -60,8 +57,32 @@ app.get('/search/:stockTicker', async function (req, res) {
         res.send(combinedStockTabResponse);
 
     } catch (error) {
-        res.status(500).json({ error: 'Something went wrong' });
+        console.log("Error is:", error.response.data);
+        res.status(500).json({ error: error.message });
     }
+});
+
+app.get('/latestPrice/:stockTicker', async function (req, res) {
+    
+        const stockTickerSymbol = req.params.stockTicker;
+    
+        try {
+            const latestPriceResponse = await axios.get('https://finnhub.io/api/v1/quote', {
+                params: {
+                    token: API_KEY,
+                    symbol: stockTickerSymbol
+                }
+            });
+    
+            if (!latestPriceResponse.data) {
+                return res.status(400).json({ error: 'Latest price not found. Please check stock ticker symbol again.' });
+            }
+    
+            res.send(latestPriceResponse.data);
+    
+        } catch (error) {
+            res.status(500).json({ error: 'Something went wrong' });
+        }
 });
 
 app.get('/chartsHourly/:stockTicker', async function (req, res) {
@@ -350,5 +371,4 @@ app.delete('/deleteStock/:stockTicker', async function (req, res) {
 
 app.listen('3000', () => {
     console.log(`Server is running on port 3000`);
-    run().catch(console.dir);
 });
