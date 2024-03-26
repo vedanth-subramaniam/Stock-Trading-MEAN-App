@@ -1,1 +1,24 @@
-<p>stock-wishlist works!</p>
+<div class="container-md w-75">
+  <div class="m-2">
+    <div *ngFor="let stock of stocks" class="stock-card">
+      <div class="stock-delete">
+        <span class="close-button" (click)="deleteStock()">&times;</span>
+      </div>
+      <div class="container-md">
+        <div class="stock-header">
+          <h2>{{ stock.ticker }}</h2>
+          <p>{{ stock.companyName }}</p>
+        </div>
+        <div class="stock-body">
+          <p class="price"
+             [ngClass]="{'negative': stock.change.amount < 0, 'positive': stock.change.amount >= 0}">{{ stock.currentPrice | currency }}</p>
+          <p [ngClass]="{'negative': stock.change.amount < 0, 'positive': stock.change.amount >= 0}">
+            {{ stock.change.amount | currency:'USD':'symbol-narrow':'1.2-2' }}
+            ({{ stock.change.percentage | number:'1.2-2' }}
+            %)
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

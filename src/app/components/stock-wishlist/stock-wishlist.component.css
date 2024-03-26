@@ -1,0 +1,35 @@
+.stock-card {
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 100%;
+}
+
+.stock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-button {
+  cursor: pointer;
+  color: red;
+}
+
+.stock-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.stock-body .price {
+  font-size: 24px;
+  margin: 0;
+}
+
+.stock-body .negative {
+  color: red;
+}
+
+.stock-body .positive {
+  color: green;
+}
