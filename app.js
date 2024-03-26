@@ -2,9 +2,21 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const axios = require('axios');
-
-require('dotenv').config();
 const API_KEY = process.env.API_KEY;
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = "mongodb+srv://vedanth1112:Masonmount3900@assignment-3-cluster.b3ibtuy.mongodb.net/?retryWrites=true&w=majority&appName=Assignment-3-Cluster";
+
+app.use(express.json());
+require('dotenv').config();
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
 
 app.use(cors());
 app.get('/search/:stockTicker', async function (req, res) {
@@ -226,6 +238,7 @@ app.get('/autoComplete/:query', async function (req, res) {
     res.send(autoCompleteResponse.data);
 });
 
+
 function filterCompleteEntries(articles) {
     // Filter articles that do not have an empty title, an empty image URL, and image URL not containing "s.yimg.com"
     return articles.filter(article =>
@@ -246,6 +259,96 @@ function convertTimestampToPST(response) {
     return { ...response, results };
 }
 
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    // List the available databases
+    const databases = await client.db().admin().listDatabases();
+    console.log("Available databases:", databases);
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+
+app.post('/insertStockWishlist', async function (req, res) {
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+
+    const dbName = "StockAssignment";
+    const collectionName = "StockWishlist";
+
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+
+    const stockData = req.body;
+
+    const result = await collection.insertOne(stockData);
+    console.log(`${result.insertedCount} document(s) inserted`);
+
+    res.send("Stock wishlist updated");
+});
+
+app.get('/getStock/:stockTicker', async function (req, res) {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "StockWishlist";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const stockTickerSymbol = req.params.stockTicker;
+        const stockData = await collection.findOne({ stockTicker: stockTickerSymbol });
+        if (stockData) {
+            res.send(stockData);
+        } else {
+            res.status(404).json({ error: 'Stock not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching stock data:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/getAllStocks', async function (req, res) {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "StockWishlist";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const stocks = await collection.find().toArray();
+        res.send(stocks);
+    } catch (error) {
+        console.error('Error fetching stock data:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.delete('/deleteStock/:stockTicker', async function (req, res) {
+    try {
+        await client.connect();
+        const dbName = "StockAssignment";
+        const collectionName = "StockWishlist";
+        const database = client.db(dbName);
+        const collection = database.collection(collectionName);
+        const stockTickerSymbol = req.params.stockTicker;
+        const result = await collection.deleteOne({ stockTicker: stockTickerSymbol });
+        if (result.deletedCount === 1) {
+            res.send("Stock deleted successfully");
+        } else {
+            res.status(404).json({ error: 'Stock not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting stock:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.listen('3000', () => {
     console.log(`Server is running on port 3000`);
+    run().catch(console.dir);
 });
