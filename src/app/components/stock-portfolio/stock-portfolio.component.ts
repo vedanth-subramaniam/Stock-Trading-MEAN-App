@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {StockApiService} from "../../services/stock-api.service";
 import {CurrencyPipe, NgForOf} from "@angular/common";
+import {BuyStockDialogComponent} from "../buy-stock-dialog/buy-stock-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-stock-portfolio',
@@ -18,33 +20,38 @@ export class StockPortfolioComponent implements OnInit {
   portFolioDataList: any;
 
 
-  constructor(private stockService: StockApiService) {
+  constructor(private stockService: StockApiService, public dialog: MatDialog) {
   }
 
   ngOnInit(): void {
     this.stockService.getPortfolioData().subscribe({
-      next:(response) =>{
+      next: (response) => {
         this.portFolioDataList = response;
         console.log(this.portFolioDataList);
       }
     });
 
     this.stockService.getWalletBalanceDB().subscribe({
-      next: (response: any) =>{
+      next: (response: any) => {
         this.walletBalance = response.balance;
         // Update the wallet balance
       }
     });
   }
 
-  buyStock(stock: any){
-    // Do the calculation to check if enough funds are there to purchase the stock
-    // If yes then update the details and quanity and send it to the DB.
-    // If no then error
-    console.log(stock);
+  buyStock(stock: any) {
+    console.log("Buying stock:", stock);
+    const dialogRef = this.dialog.open(BuyStockDialogComponent, {
+      width: '400px',
+      data: {stock: stock, walletBalance: this.walletBalance}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+    });
   }
 
-  sellStock(stock: any){
+  sellStock(stock: any) {
     // Do the calculation and update the wallet balance
     // Update the records in the DB
     console.log(stock);

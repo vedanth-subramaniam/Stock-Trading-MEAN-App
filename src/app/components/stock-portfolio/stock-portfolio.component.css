@@ -10,7 +10,7 @@
 
 .card-header {
   padding: 0.75rem 1.25rem;
-  background-color: #007bff; /* Or the exact blue used in your design */
+  background-color: #d9d5d5; /* Or the exact blue used in your design */
   color: white;
 }
 
@@ -25,12 +25,4 @@
 .btn {
   padding: 0.375rem 0.75rem; /* Bootstrap's default padding */
   margin-top: 0.5rem; /* Spacing between the button and the text above it */
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .btn {
-    width: 100%;
-    margin-top: 0.5rem;
-  }
 }
