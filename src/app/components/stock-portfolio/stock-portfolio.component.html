@@ -1,1 +1,28 @@
-<p>stock-portfolio works!</p>
+<div class="container my-4">
+  <div class="portfolio-heading text-center">
+    <h1>My Portfolio</h1>
+    <h3>Wallet Balance: {{ walletBalance | currency }}</h3>
+  </div>
+  <div class="stock-portfolio mt-3">
+    <div *ngFor="let stock of portFolioDataList" class="card stock-card mb-3">
+      <div class="card-header bg-primary text-white">
+        <div class="stock-heading">{{ stock.ticker }} {{ stock.companyName }}</div>
+      </div>
+      <div class="card-body">
+        <div class="stock-data row">
+          <div class="col">Quantity: <strong>{{ stock.quantity }}</strong></div>
+          <div class="col">Avg. Cost / Share: <strong>{{ stock.avgCost | currency }}</strong></div>
+          <div class="col">Total Cost: <strong>{{ stock.totalCost | currency }}</strong></div>
+          <div class="w-100"></div> <!-- This will force a line break for the next items -->
+          <div class="col">Change: <strong>{{ stock.change | currency }}</strong></div>
+          <div class="col">Current Price: <strong>{{ stock.currentPrice | currency }}</strong></div>
+          <div class="col">Market Value: <strong>{{ stock.marketValue | currency }}</strong></div>
+        </div>
+        <div class="stock-actions mt-3 text-center">
+          <button class="btn btn-success mx-2" (click)="buyStock(stock)">Buy</button>
+          <button class="btn btn-danger mx-2" (click)="sellStock(stock)">Sell</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
