@@ -28,7 +28,7 @@ export class StockWishlistComponent implements OnInit {
       this.stocks = data;
       console.log(this.stocks);
       for (let stock of this.stocks) {
-        this.stockService.getLatestStockPrice(stock.ticker).subscribe({
+        this.stockService.getLatestStockPrice(stock.stockTicker).subscribe({
           next: (response: any) => {
             let stockLatestPrice = response;
             stock.currentPrice = stockLatestPrice.c;
@@ -57,7 +57,7 @@ export class StockWishlistComponent implements OnInit {
 
 export interface Stock {
   _id: any
-  ticker: string;
+  stockTicker: string;
   companyName: string;
   currentPrice: number;
   change: {

@@ -475,7 +475,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     if(this.isFavorite) {
       let stockData = {
-        "ticker": this.tickerSymbol,
+        "stockTicker": this.tickerSymbol,
         "companyName": this.stockProfile.name,
         "currentPrice": this.latestPrice.c,
         "change": {

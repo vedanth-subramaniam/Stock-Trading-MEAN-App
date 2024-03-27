@@ -61,9 +61,14 @@
             </div>
           </div>
           <div>
-            <ul class="list-group list-group-flush">
-              <li class="list-group">{{ latestPrice?.c }}</li>
-              <li class="list-group">{{ latestPrice?.d }}({{ latestPrice?.dp }})</li>
+            <ul class="list-group list-group-flush stock-body">
+              <li class="list-group"
+                  [ngClass]="{'negative': latestPrice?.d < 0, 'positive': latestPrice?.d >= 0}">{{ latestPrice?.c }}
+              </li>
+              <li class="list-group"
+                  [ngClass]="{'negative': latestPrice?.d < 0, 'positive': latestPrice?.d >= 0}">{{ latestPrice?.d }}
+                ({{ latestPrice?.dp }})
+              </li>
               <li class="list-group">{{ latestPrice?.t * 1000 | date:'medium' }}</li>
             </ul>
           </div>
