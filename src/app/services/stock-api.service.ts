@@ -42,23 +42,57 @@ export class StockApiService {
     return this.http.get("http://localhost:3000/getAllStocks");
   }
 
-  postIntoWishListData() {
-    let stockData1 = {
-      "ticker": "TSLA",
-      "companyName": "TSLA Corp",
-      "currentPrice": 404.06,
-      "change": {
-        "amount": -2.50,
-        "percentage": -0.61
-      }
-    }
-    return this.http.post("http://localhost:3000/insertWishlist", stockData1);
+  getTickerWishListDB(stockTicker: any){
+    return this.http.get("http://localhost:3000/getStock/" + stockTicker);
+  }
+  postIntoWishListData(stockData:any) {
+    return this.http.post("http://localhost:3000/insertStockWishlist", stockData);
   }
 
-  deleteFromWishlistDB(stockTicker: any){
+  deleteFromWishlistDB(stockTicker: any) {
     console.log("Delete api in service");
     console.log(stockTicker);
     return this.http.get("http://localhost:3000/deleteStockFromWishlist/" + stockTicker);
+  }
+
+  getPortfolioData(): Observable<any> {
+    console.log("Get All from the Portfolio");
+    return this.http.get("http://localhost:3000/getAllPortfolioData");
+  }
+
+  postIntoPortfolioData() {
+    let portfolioData = {
+      "ticker": "AAPL",
+      "companyName": "Apple Inc",
+      "quantity": 5,
+      "avgCostPerShare": 184.37,
+      "totalCost": 921.85,
+      "change": 0,
+      "currentPrice": 184.37,
+      "marketValue": 921.85
+    }
+    return this.http.post("http://localhost:3000/insertWishlist", portfolioData);
+  }
+
+  deleteFromPortfolioDB(stockTicker: any) {
+    console.log("Delete Portfolio in service");
+    return this.http.get("http://localhost:3000/deleteFromPortfolio/" + stockTicker);
+  }
+
+  getSingleRecordPortfolioDB(stockTicker: any) {
+    console.log("fetching portfolio records for single record");
+    return this.http.get("http://localhost:3000/getPortfolioData/" + stockTicker);
+  }
+
+  getWalletBalanceDB() {
+    return this.http.get("http://localhost:3000/wallet");
+  }
+
+  updateWalletBalanceDB(balance: any) {
+    let walletBalance = {
+      "balance": balance
+    }
+    return this.http.post("http://localhost:3000/updateWalletBalance", walletBalance);
   }
 }
 

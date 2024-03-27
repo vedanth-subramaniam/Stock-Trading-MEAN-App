@@ -12,7 +12,7 @@ import {
   switchMap,
   tap
 } from "rxjs";
-import {AsyncPipe, DatePipe, NgForOf, NgIf, NgOptimizedImage, NgTemplateOutlet} from "@angular/common";
+import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf, NgOptimizedImage, NgTemplateOutlet} from "@angular/common";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
@@ -36,6 +36,7 @@ import indicators from 'highcharts/indicators/indicators';
 import volumeByPrice from 'highcharts/indicators/volume-by-price';
 import HC_stock from 'highcharts/modules/stock';
 import indicatorsAll from 'highcharts/indicators/indicators-all'
+import {MatIcon} from "@angular/material/icon";
 
 // Initialize the module
 HC_stock(Highcharts);
@@ -47,7 +48,7 @@ volumeByPrice(Highcharts);
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -65,6 +66,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   companyPeers: any;
   latestPrice: any;
   stockProfile: any;
+  stockPortfolioData: any;
 
   newsResponse!: any;
   chartResponse!: any;
@@ -98,6 +100,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     if (state) {
       this.tickerSymbol = state.tickerSymbol;
       this.companyInfoResponse = state.companyInfoResponse;
+      this.chartsHourlyResponse = state.chartsHourlyResponse;
+      this.chartsHourlyDataList = state.chartsHourlyDataList;
+      this.chartOptions = state.chartOptions;
+      this.chartOptionsSummary = state.chartOptionsSummary;
       this.companyPeers = state.companyPeers;
       this.latestPrice = state.latestPrice;
       this.stockProfile = state.stockProfile;
@@ -105,6 +111,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       this.chartResponse = state.chartResponse;
       this.insightsResponse = state.insightsResponse;
       this.currentTab = state.currentTab;
+      this.stockPortfolioData = state.stockPortfolioData;
       this.stockSearchControl.setValue(state.searchInputValue);
     }
     this.autocompleteSearchResults = [];
@@ -132,8 +139,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   searchStock(searchInput: any) {
     this.stockSearchControl.setValue(searchInput);
     this.tickerSymbol = searchInput.toUpperCase();
-    this.currentTab = "";
     this.errorMessage = false;
+    this.currentTab = "";
     console.log('Searching for stock:', this.tickerSymbol);
 
     const apiInterval$ = interval(15000).pipe(startWith(0));
@@ -147,8 +154,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
             this.stockProfile = this.companyInfoResponse.stockProfile;
             this.latestPrice = this.companyInfoResponse.latestPrice;
             this.companyPeers = this.companyInfoResponse.companyPeers;
-            this.onStateChange();
             this.currentTab = "Summary";
+            this.onStateChange();
             if (this.companyInfoResponse.companyPeers.length == 0) {
               console.log("Empty");
               this.currentTab = "";
@@ -160,6 +167,28 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         ))
       ).subscribe()
     );
+
+    this.stockService.getSingleRecordPortfolioDB(this.tickerSymbol).subscribe({
+      next: (response: any) => {
+        this.stockPortfolioData = response;
+        console.log("Stock Portfolio Data", this.stockPortfolioData);
+      },
+      error: (error: any) => {
+        if (error.status == "404") {
+          this.stockPortfolioData.quantity = 0;
+        }
+      }
+    });
+
+    this.stockService.getTickerWishListDB(this.tickerSymbol).subscribe({
+      next:(response:any) => {
+        console.log("Stock has been fetched from wishlist");
+        this.isFavorite = true;
+      },
+      error: (error: any) => {
+        this.isFavorite = false;
+      }
+    })
 
     this.stockService.getChartsHourlyDetailsAPI(this.tickerSymbol).subscribe({
       next: (response) => {
@@ -213,7 +242,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       }
     });
 
-    // this.currentTab = "Summary";
     this.onStateChange();
     console.log('State changes', this.stockStateService.getState());
   }
@@ -379,7 +407,13 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       chartResponse: this.chartResponse,
       insightsResponse: this.insightsResponse,
       currentTab: this.currentTab,
-      searchInputValue: this.stockSearchControl.value
+      stockPortfolioData: this.stockPortfolioData,
+      chartHourlyResponse: this.chartsHourlyResponse,
+      chartsHourlyDataList: this.chartsHourlyDataList,
+      chartOptions: this.chartOptions,
+      chartOptionsSummary: this.chartOptionsSummary,
+      searchInputValue: this.stockSearchControl.value,
+      isFavorite: this.isFavorite
     });
   }
 
@@ -392,7 +426,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         type: 'line'
       },
       title: {
-        text: 'AAPL Hourly Price Variation'
+        text: this.chartsHourlyResponse.ticker + ' Hourly Price Variation'
       },
       xAxis: {
         type: 'datetime',
@@ -434,9 +468,53 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   protected readonly auto = auto;
   protected readonly console = console;
+  isFavorite: boolean = false;
+
+  toggleFavorite() {
+    this.isFavorite = !this.isFavorite;
+
+    if(this.isFavorite) {
+      let stockData = {
+        "ticker": this.tickerSymbol,
+        "companyName": this.stockProfile.name,
+        "currentPrice": this.latestPrice.c,
+        "change": {
+          "amount": this.latestPrice.d,
+          "percentage": this.latestPrice.dp
+        }
+      }
+      this.stockService.postIntoWishListData(stockData).subscribe({
+        next: (response: any) => {
+          console.log(response);
+          console.log("Added to wishlist");
+        }
+      });
+    } else {
+      this.stockService.deleteFromWishlistDB(this.tickerSymbol).subscribe({
+        next: (response:any) => {
+          console.log("Removed from wishlist");
+        }
+      });
+    }
+    this.onStateChange();
+    console.log("Button clicked");
+
+  }
 }
 
 interface StockOption {
   displaySymbol: string;
   description: string;
+}
+
+interface StockPortfolioRecord {
+  _id: any,
+  ticker: string,
+  companyName: string,
+  quantity: number,
+  avgCostPerShare: number,
+  totalCost: number,
+  change: number,
+  currentPrice: number,
+  marketValue: number
 }
