@@ -4,7 +4,7 @@ const cors = require('cors');
 const axios = require('axios');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://vedanth1112:Masonmount3900@assignment-3-cluster.b3ibtuy.mongodb.net/?retryWrites=true&w=majority&appName=Assignment-3-Cluster";
-
+const port = 3000;
 app.use(express.json());
 
 const client = new MongoClient(uri, {
@@ -295,6 +295,7 @@ async function run() {
     }
 }
 
+
 app.post('/insertStockWishlist', async function (req, res) {
     await client.connect();
     // Send a ping to confirm a successful connection
@@ -308,8 +309,14 @@ app.post('/insertStockWishlist', async function (req, res) {
 
     const stockData = req.body;
 
-    const result = await collection.insertOne(stockData);
-    console.log(`${result.insertedCount} document(s) inserted`);
+    console.log("Stock data is:", stockData);
+
+    const filter = { stockTicker: stockData.stockTicker };
+    const update = { $set: stockData };
+    const options = { upsert: true };
+
+    const result = await collection.updateOne(filter, update, options);
+    console.log(`${result.modifiedCount} document(s) updated`);
 
     res.send("Stock wishlist updated");
 });
@@ -358,7 +365,7 @@ app.get('/deleteStockFromWishlist/:stockTicker', async function (req, res) {
         const database = client.db(dbName);
         const collection = database.collection(collectionName);
         const stockTickerSymbol = req.params.stockTicker;
-        const result = await collection.deleteOne({ ticker: stockTickerSymbol });
+        const result = await collection.deleteOne({ stockTicker: stockTickerSymbol });
         if (result.deletedCount === 1) {
             res.send("Stock deleted successfully");
         } else {
@@ -478,7 +485,7 @@ app.post('/updateWalletBalance', async function (req, res) {
     }
 });
 
-app.listen('3000', () => {
-    console.log(`Server is running on port 3000`);
+app.listen(port, () => {
+    console.log(`Server is running on port ` + port);
     run().catch(console.dir);
 });
