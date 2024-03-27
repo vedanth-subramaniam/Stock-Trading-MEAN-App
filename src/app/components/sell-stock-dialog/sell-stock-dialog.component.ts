@@ -1,44 +1,44 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject} from '@angular/core';
+import {CurrencyPipe, NgIf} from "@angular/common";
+import {FormsModule} from "@angular/forms";
+import {MatButton} from "@angular/material/button";
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
-  MatDialogRef, MatDialogTitle
+  MatDialogRef,
+  MatDialogTitle
 } from "@angular/material/dialog";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
-import {FormsModule} from "@angular/forms";
-import {MatButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
-import {CurrencyPipe, NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-buy-stock-dialog',
+  selector: 'app-sell-stock-dialog',
   standalone: true,
   imports: [
-    MatDialogContent,
-    MatFormField,
-    FormsModule,
-    MatDialogActions,
-    MatButton,
-    MatInput,
     CurrencyPipe,
+    FormsModule,
+    MatButton,
+    MatDialogActions,
     MatDialogClose,
+    MatDialogContent,
     MatDialogTitle,
+    MatFormField,
+    MatInput,
     MatLabel,
     NgIf
   ],
-  templateUrl: './buy-stock-dialog.component.html',
-  styleUrl: './buy-stock-dialog.component.css'
+  templateUrl: './sell-stock-dialog.component.html',
+  styleUrl: './sell-stock-dialog.component.css'
 })
-export class BuyStockDialogComponent implements OnInit {
-
+export class SellStockDialogComponent {
   quantity = 1;
   total = 0;
   walletBalance: number;
 
   constructor(
-    public dialogRef: MatDialogRef<BuyStockDialogComponent>,
+    public dialogRef: MatDialogRef<SellStockDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.walletBalance = data.walletBalance;
@@ -60,6 +60,4 @@ export class BuyStockDialogComponent implements OnInit {
     console.log(this.data.stock);
     console.log(this.data.walletBalance);
   }
-
-
 }

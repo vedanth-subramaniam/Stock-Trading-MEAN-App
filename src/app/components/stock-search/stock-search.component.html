@@ -48,8 +48,10 @@
               <li class="list-group">{{ stockProfile?.name }}</li>
               <li class="list-group">{{ stockProfile?.exchange }}</li>
               <li class="list-group d-md-flex flex-row justify-content-center">
-                <button class="btn btn-success p-2 m-2 w-25">Buy</button>
-                <button class="btn btn-danger p-2 m-2 w-25" *ngIf="stockPortfolioData?.quantity > 0">Sell</button>
+                <button class="btn btn-success p-2 m-2 w-25" (click)="buyStock(stockPortfolioData)">Buy</button>
+                <button class="btn btn-danger p-2 m-2 w-25" *ngIf="stockPortfolioData?.quantity > 0"
+                        (click)="sellStock(stockPortfolioData)">Sell
+                </button>
               </li>
             </ul>
           </div>

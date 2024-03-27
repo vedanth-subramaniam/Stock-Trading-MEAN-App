@@ -37,6 +37,9 @@ import volumeByPrice from 'highcharts/indicators/volume-by-price';
 import HC_stock from 'highcharts/modules/stock';
 import indicatorsAll from 'highcharts/indicators/indicators-all'
 import {MatIcon} from "@angular/material/icon";
+import {BuyStockDialogComponent} from "../buy-stock-dialog/buy-stock-dialog.component";
+import {response} from "express";
+import {SellStockDialogComponent} from "../sell-stock-dialog/sell-stock-dialog.component";
 
 // Initialize the module
 HC_stock(Highcharts);
@@ -83,6 +86,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   chartOptionsSummary: any;
   chartsHourlyResponse: any;
   chartsHourlyDataList: any;
+
+
+  walletBalance = 0;
   // References to the template elements
   @ViewChild('summaryTab') summaryTemplate!: TemplateRef<any>;
   @ViewChild('newsTab') newsTemplate!: TemplateRef<any>;
@@ -181,7 +187,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     });
 
     this.stockService.getTickerWishListDB(this.tickerSymbol).subscribe({
-      next:(response:any) => {
+      next: (response: any) => {
         console.log("Stock has been fetched from wishlist");
         this.isFavorite = true;
       },
@@ -242,6 +248,12 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.stockService.getWalletBalanceDB().subscribe({
+      next: (response: any) => {
+        console.log("Wallet fetched from DB");
+        this.walletBalance = response.balance;
+      }
+    });
     this.onStateChange();
     console.log('State changes', this.stockStateService.getState());
   }
@@ -288,6 +300,30 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     dialogConfig.panelClass = 'my-custom-dialog';
     dialogConfig.data = newsDetail;
     this.dialog.open(NewsDetailsDialogComponent, dialogConfig);
+  }
+
+  buyStock(stock: any) {
+    console.log("Buying stock:", stock);
+    const dialogRef = this.dialog.open(BuyStockDialogComponent, {
+      width: '400px',
+      data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+    });
+  }
+
+  sellStock(stock: any) {
+    console.log("Selling stock:", stock);
+    const dialogRef = this.dialog.open(SellStockDialogComponent, {
+      width: '400px',
+      data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+    });
   }
 
   getChartsTabGraph(ohlc: any, volume: any) {
@@ -473,7 +509,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   toggleFavorite() {
     this.isFavorite = !this.isFavorite;
 
-    if(this.isFavorite) {
+    if (this.isFavorite) {
       let stockData = {
         "stockTicker": this.tickerSymbol,
         "companyName": this.stockProfile.name,
@@ -491,7 +527,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       });
     } else {
       this.stockService.deleteFromWishlistDB(this.tickerSymbol).subscribe({
-        next: (response:any) => {
+        next: (response: any) => {
           console.log("Removed from wishlist");
         }
       });

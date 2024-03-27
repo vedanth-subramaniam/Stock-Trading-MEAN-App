@@ -3,6 +3,7 @@ import {StockApiService} from "../../services/stock-api.service";
 import {CurrencyPipe, NgForOf} from "@angular/common";
 import {BuyStockDialogComponent} from "../buy-stock-dialog/buy-stock-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
+import {SellStockDialogComponent} from "../sell-stock-dialog/sell-stock-dialog.component";
 
 @Component({
   selector: 'app-stock-portfolio',
@@ -52,9 +53,15 @@ export class StockPortfolioComponent implements OnInit {
   }
 
   sellStock(stock: any) {
-    // Do the calculation and update the wallet balance
-    // Update the records in the DB
-    console.log(stock);
+    console.log("Selling stock:", stock);
+    const dialogRef = this.dialog.open(SellStockDialogComponent, {
+      width: '400px',
+      data: {stock: stock, walletBalance: this.walletBalance}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+    });
   }
 }
 
