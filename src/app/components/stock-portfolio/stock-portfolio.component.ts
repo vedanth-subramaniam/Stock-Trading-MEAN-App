@@ -20,22 +20,28 @@ export class StockPortfolioComponent implements OnInit {
   walletBalance: any;
   portFolioDataList: any;
 
-
   constructor(private stockService: StockApiService, public dialog: MatDialog) {
   }
 
   ngOnInit(): void {
+
     this.stockService.getPortfolioData().subscribe({
       next: (response) => {
         this.portFolioDataList = response;
-        console.log(this.portFolioDataList);
+        for (let stock of this.portFolioDataList) {
+          this.stockService.getLatestStockPrice(stock.ticker).subscribe({
+            next: (response: any) => {
+              console.log("Fetching latest price for ", stock.ticker);
+              stock.currentPrice = response.c;
+            }
+          })
+        }
       }
     });
 
     this.stockService.getWalletBalanceDB().subscribe({
       next: (response: any) => {
         this.walletBalance = response.balance;
-        // Update the wallet balance
       }
     });
   }
@@ -44,7 +50,7 @@ export class StockPortfolioComponent implements OnInit {
     console.log("Buying stock:", stock);
     const dialogRef = this.dialog.open(BuyStockDialogComponent, {
       width: '400px',
-      data: {stock: stock, walletBalance: this.walletBalance}
+      data: {stock: stock, walletBalance: this.walletBalance, latestPrice: stock.currentPrice}
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -56,7 +62,7 @@ export class StockPortfolioComponent implements OnInit {
     console.log("Selling stock:", stock);
     const dialogRef = this.dialog.open(SellStockDialogComponent, {
       width: '400px',
-      data: {stock: stock, walletBalance: this.walletBalance}
+      data: {stock: stock, walletBalance: this.walletBalance, latestPrice: stock.currentPrice}
     });
 
     dialogRef.afterClosed().subscribe(result => {

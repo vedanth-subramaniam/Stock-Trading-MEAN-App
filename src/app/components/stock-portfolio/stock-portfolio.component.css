@@ -10,8 +10,8 @@
 
 .card-header {
   padding: 0.75rem 1.25rem;
-  background-color: #d9d5d5; /* Or the exact blue used in your design */
-  color: white;
+  background-color: #ecebeb; /* Or the exact blue used in your design */
+  color: #110f0f;
 }
 
 .card-body {
@@ -20,9 +20,14 @@
 
 .stock-heading {
   font-size: 1.5rem; /* Adjust according to your design */
+  color: #110f0f;
 }
 
 .btn {
   padding: 0.375rem 0.75rem; /* Bootstrap's default padding */
   margin-top: 0.5rem; /* Spacing between the button and the text above it */
+}
+
+.button-actions {
+  background-color: #ecebeb;
 }

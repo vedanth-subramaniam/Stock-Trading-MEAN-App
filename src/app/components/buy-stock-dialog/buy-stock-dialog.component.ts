@@ -46,7 +46,7 @@ export class BuyStockDialogComponent implements OnInit {
   }
 
   updateTotal() {
-    this.total = this.data.stock.currentPrice * this.quantity;
+    this.total = this.data.latestPrice * this.quantity;
   }
 
   confirmPurchase() {

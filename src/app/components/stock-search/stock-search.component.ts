@@ -171,7 +171,11 @@ export class StockSearchComponent implements OnInit, OnDestroy {
           },
           error => console.error('Error fetching Company Common Details', error)
         ))
-      ).subscribe()
+      ).subscribe({
+        next: (response: any) => {
+          console.log("Company details over")
+        }
+      })
     );
 
     this.stockService.getSingleRecordPortfolioDB(this.tickerSymbol).subscribe({
@@ -306,7 +310,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Buying stock:", stock);
     const dialogRef = this.dialog.open(BuyStockDialogComponent, {
       width: '400px',
-      data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance}
+      data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance, latestPrice: this.latestPrice.c}
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -318,7 +322,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Selling stock:", stock);
     const dialogRef = this.dialog.open(SellStockDialogComponent, {
       width: '400px',
-      data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance}
+      data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance, latestPrice: this.latestPrice}
     });
 
     dialogRef.afterClosed().subscribe(result => {

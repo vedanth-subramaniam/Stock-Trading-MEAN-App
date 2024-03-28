@@ -1,7 +1,7 @@
 <!-- buy-stock-dialog.component.html -->
 <h2 mat-dialog-title>{{ data.stock.ticker }}</h2>
 <mat-dialog-content class="mat-typography">
-  <p>Current Price: {{ data.stock.currentPrice | currency }}</p>
+  <p>Current Price: {{ data.latestPrice | currency }}</p>
   <p>Money in Wallet: {{ walletBalance | currency }}</p>
   <mat-form-field>
     <mat-label>Quantity</mat-label>
