@@ -1,21 +1,24 @@
-<div class="container-md w-75">
-  <div class="m-2">
-    <div *ngFor="let stock of stocks; let i = index" class="stock-card">
-      <div class="stock-delete">
-        <span class="close-button" (click)="deleteStock(stock._id, stock.stockTicker, i)">&times;</span>
-      </div>
-      <div class="container-md">
-        <div class="stock-header">
-          <h2>{{ stock.stockTicker }}</h2>
-          <p>{{ stock.companyName }}</p>
+<div class="container my-4">
+  <h1>My Watchlist</h1>
+  <div *ngFor="let stock of stocks; let i = index" class="card mb-3">
+    <div class="card-body">
+      <button type="button" class="close" aria-label="Close" (click)="deleteStock(stock._id, stock.stockTicker, i)">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="row align-items-center">
+        <div class="col">
+          <h5 class="watch-card-title">{{ stock.stockTicker }}</h5>
+          <h6 class="watch-card-subtitle mb-2 text-muted">{{ stock.companyName }}</h6>
         </div>
-        <div class="stock-body">
-          <p class="price"
-             [ngClass]="{'negative': stock.change.amount < 0, 'positive': stock.change.amount >= 0}">{{ stock.currentPrice | currency }}</p>
-          <p [ngClass]="{'negative': stock.change.amount < 0, 'positive': stock.change.amount >= 0}">
+        <div class="col text-right">
+          <p class="card-text price"
+             [ngClass]="{'text-danger': stock.change.amount < 0, 'text-success': stock.change.amount >= 0}">
+            {{ stock.currentPrice | currency }}
+          </p>
+          <p class="card-text"
+             [ngClass]="{'text-danger': stock.change.amount < 0, 'text-success': stock.change.amount >= 0}">
             {{ stock.change.amount | currency:'USD':'symbol-narrow':'1.2-2' }}
-            ({{ stock.change.percentage | number:'1.2-2' }}
-            %)
+            ({{ stock.change.percentage | number:'1.2-2' }}%)
           </p>
         </div>
       </div>
