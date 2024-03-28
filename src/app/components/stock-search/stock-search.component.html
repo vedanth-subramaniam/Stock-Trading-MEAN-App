@@ -30,49 +30,51 @@
     <h1>ERROR NO SEARCH RESULTS PRESENT</h1>
   </div>
 </section>
-<div #searchPageContents>
+<div #searchPageContents class="container-md my-4">
   <div *ngIf="(currentTab == 'Summary') then companyInfo">
   </div>
   <div id="common-company-info-section">
     <ng-template #companyInfo>
-      <div>
-        <div class="d-md-flex justify-content-md-evenly company-info-card">
+      <div class="container-sm">
+        <div class="d-sm-flex justify-content-sm-evenly company-info-card fs-5">
           <div>
-            <ul class="list-group">
-              <li class="list-group">{{ stockProfile?.ticker }}
-                <!-- Your component's template -->
+            <div>
+              <div class="p-1">
+                {{ stockProfile?.ticker }}
                 <i [ngClass]="{'bi bi-star': !isFavorite, 'bi bi-star-fill text-warning': isFavorite}"
                    class="favorite-icon"
                    (click)="toggleFavorite()"></i>
-              </li>
-              <li class="list-group">{{ stockProfile?.name }}</li>
-              <li class="list-group">{{ stockProfile?.exchange }}</li>
-              <li class="list-group d-md-flex flex-row justify-content-center">
+              </div>
+              <div class="p-1">{{ stockProfile?.name }}</div>
+              <div class="p-1 fs-6">{{ stockProfile?.exchange }}</div>
+              <div class="d-md-flex flex-row justify-content-center p-1">
                 <button class="btn btn-success p-2 m-2 w-25" (click)="buyStock(stockPortfolioData)">Buy</button>
                 <button class="btn btn-danger p-2 m-2 w-25" *ngIf="stockPortfolioData?.quantity > 0"
                         (click)="sellStock(stockPortfolioData)">Sell
                 </button>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <img class="stock-company-logo" [src]="stockProfile?.logo">
-            <div>
-              <p *ngIf="getMarketStatus()" class="text-danger">Market is Closed</p>
-              <p *ngIf="!getMarketStatus()" class="text-success">Market is Open</p>
+              </div>
             </div>
           </div>
           <div>
-            <ul class="list-group list-group-flush stock-body">
-              <li class="list-group"
-                  [ngClass]="{'negative': latestPrice?.d < 0, 'positive': latestPrice?.d >= 0}">{{ latestPrice?.c }}
-              </li>
-              <li class="list-group"
-                  [ngClass]="{'negative': latestPrice?.d < 0, 'positive': latestPrice?.d >= 0}">{{ latestPrice?.d }}
+            <div class="text-center p-1">
+              <img class="stock-company-logo" [src]="stockProfile?.logo">
+            </div>
+            <div class="text-center p-1">
+              <div *ngIf="getMarketStatus()" class="text-danger ">Market is Closed</div>
+              <div *ngIf="!getMarketStatus()" class="text-success">Market is Open</div>
+            </div>
+          </div>
+          <div>
+            <div class="p-1 stock-body">
+              <div class="p-1"
+                   [ngClass]="{'negative': latestPrice?.d < 0, 'positive': latestPrice?.d >= 0}">{{ latestPrice?.c }}
+              </div>
+              <div class="p-1"
+                   [ngClass]="{'negative': latestPrice?.d < 0, 'positive': latestPrice?.d >= 0}">{{ latestPrice?.d }}
                 ({{ latestPrice?.dp }})
-              </li>
-              <li class="list-group">{{ latestPrice?.t * 1000 | date:'medium' }}</li>
-            </ul>
+              </div>
+              <div class="p-1 fs-6">{{ latestPrice?.t * 1000 | date:'medium' }}</div>
+            </div>
           </div>
         </div>
         <div>
@@ -89,40 +91,44 @@
   </div>
   <div id="company-summary-section">
     <ng-template #summaryTab>
-      <div>
-        <div>
-          <div>
-            <ul class="list-group">
-              <li class="list-group-item">High Price : {{ latestPrice?.h }}</li>
-              <li class="list-group-item">Low Price: {{ latestPrice?.l }}</li>
-              <li class="list-group-item">Open Price: {{ latestPrice?.o }}</li>
-              <li class="list-group-item">Prev. Close: {{ latestPrice?.pc }}</li>
-            </ul>
-          </div>
+      <div class="container-md d-md-flex">
+        <div class="row">
           <div>
             <div>
-              <p><strong>About the company</strong></p>
+              <div class="text-center m-2">
+                <div>High Price : {{ latestPrice?.h }}</div>
+                <div>Low Price: {{ latestPrice?.l }}</div>
+                <div>Open Price: {{ latestPrice?.o }}</div>
+                <div>Prev. Close: {{ latestPrice?.pc }}</div>
+              </div>
             </div>
             <div>
-              <p><strong>IPO Start Date: </strong>{{ stockProfile?.ipo }}</p>
-              <p><strong>Industry: </strong>{{ stockProfile?.finnhubIndustry }}</p>
-              <p><strong>Webpage: </strong><a href="{{stockProfile?.weburl}}">{{ stockProfile?.weburl }}</a></p>
-              <p><strong>Company Peers: </strong></p>
-              <div class="company-peers-container">
+              <div>
+                <p><strong>About the company</strong></p>
+              </div>
+              <div>
+                <p><strong>IPO Start Date: </strong>{{ stockProfile?.ipo }}</p>
+                <p><strong>Industry: </strong>{{ stockProfile?.finnhubIndustry }}</p>
+                <p><strong>Webpage: </strong><a href="{{stockProfile?.weburl}}">{{ stockProfile?.weburl }}</a></p>
+                <p><strong>Company Peers: </strong></p>
+                <div class="company-peers-container">
               <span *ngFor="let company of companyPeers; let isLast=last">
                     <a href="#"
                        (click)="searchStock(company); $event.preventDefault()">{{ company }}</a>
               </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="company-hourly-charts-container">
-          <highcharts-chart
-            [Highcharts]="Highcharts"
-            [options]="chartOptionsSummary"
-            style="width: 50%; height: 400px; display: block;">
-          </highcharts-chart>
+        <div class="row w-75">
+          <div class="cols-4 text-center">
+            <highcharts-chart
+              [Highcharts]="Highcharts"
+              [options]="chartOptionsSummary"
+              style="width: 100%; height: 400px; display: block;">
+            </highcharts-chart>
+          </div>
         </div>
       </div>
     </ng-template>

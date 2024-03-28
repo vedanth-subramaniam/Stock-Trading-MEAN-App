@@ -118,6 +118,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       this.insightsResponse = state.insightsResponse;
       this.currentTab = state.currentTab;
       this.stockPortfolioData = state.stockPortfolioData;
+      this.isFavorite = state.isFavorite;
       this.stockSearchControl.setValue(state.searchInputValue);
     }
     this.autocompleteSearchResults = [];
@@ -511,6 +512,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   isFavorite: boolean = false;
 
   toggleFavorite() {
+    console.log("THis is the value of favourite", this.isFavorite);
     this.isFavorite = !this.isFavorite;
 
     if (this.isFavorite) {
