@@ -385,16 +385,21 @@ app.post('/insertIntoPortfolio', async (req, res) => {
         const database = client.db(dbName);
         const collection = database.collection(collectionName);
         const stockTickerSymbol = req.body.ticker;
-        const existingRecord = await collection.findOne({ ticker: stockTickerSymbol });
-        if (existingRecord) {
-            const result = await collection.updateOne({ ticker: stockTickerSymbol }, { $set: req.body });
-            res.status(200).send(`Document updated with _id: ${existingRecord._id}`);
-        } else {
-            const result = await collection.insertOne(req.body);
-            res.status(201).send(`Document inserted with _id: ${result.insertedId}`);
-        }
-    } catch (e) {
-        res.status(500).send(e.message);
+
+        const { _id, ...bodyWithoutId } = req.body; // Exclude '_id' from the body
+
+        const filter = { ticker: stockTickerSymbol };
+        const update = { $set: bodyWithoutId }; // Use the body without '_id'
+        const options = { upsert: true };
+    
+        const result = await collection.updateOne(filter, update, options);
+        
+        console.log(`${result.modifiedCount} document(s) updated`);
+
+        res.send("Stock portfolio updated");
+    } catch (error) {
+        console.error('Error updating stock portfolio:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
