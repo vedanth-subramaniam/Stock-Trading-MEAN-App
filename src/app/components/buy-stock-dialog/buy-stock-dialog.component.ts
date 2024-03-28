@@ -11,6 +11,8 @@ import {FormsModule} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {CurrencyPipe, NgIf} from "@angular/common";
+import {StockApiService} from "../../services/stock-api.service";
+import {error} from "@angular/compiler-cli/src/transformers/util";
 
 @Component({
   selector: 'app-buy-stock-dialog',
@@ -39,8 +41,12 @@ export class BuyStockDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<BuyStockDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    public stockService: StockApiService
   ) {
+    this.stockService.getWalletBalanceDB().subscribe({
+      next:(response: any) => this.walletBalance = response.balance,
+    });
     this.walletBalance = data.walletBalance;
     this.updateTotal(); // Initialize total
   }
@@ -51,6 +57,18 @@ export class BuyStockDialogComponent implements OnInit {
 
   confirmPurchase() {
     if (this.total <= this.walletBalance) {
+      this.data.stock.quantity += this.quantity;
+      this.data.stock.totalCost += this.total;
+      console.log("Buying the following stock");
+      console.log(this.data.stock);
+      this.stockService.postIntoPortfolioData(this.data.stock).subscribe({
+        next: () => console.log("Updated stock data"),
+        error: (error: any) => console.log("Some error occurred while buying", error)
+      });
+      this.walletBalance -= this.total;
+      this.stockService.updateWalletBalanceDB(this.walletBalance).subscribe({
+        next: () => console.log("Updated wallet price")
+      })
       this.dialogRef.close(this.quantity);
     }
   }
@@ -60,6 +78,4 @@ export class BuyStockDialogComponent implements OnInit {
     console.log(this.data.stock);
     console.log(this.data.walletBalance);
   }
-
-
 }

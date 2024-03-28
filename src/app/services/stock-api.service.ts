@@ -60,18 +60,8 @@ export class StockApiService {
     return this.http.get("http://localhost:3000/getAllPortfolioData");
   }
 
-  postIntoPortfolioData() {
-    let portfolioData = {
-      "ticker": "AAPL",
-      "companyName": "Apple Inc",
-      "quantity": 5,
-      "avgCostPerShare": 184.37,
-      "totalCost": 921.85,
-      "change": 0,
-      "currentPrice": 184.37,
-      "marketValue": 921.85
-    }
-    return this.http.post("http://localhost:3000/insertWishlist", portfolioData);
+  postIntoPortfolioData(portfolioData:any) {
+    return this.http.post("http://localhost:3000/insertIntoPortfolio", portfolioData);
   }
 
   deleteFromPortfolioDB(stockTicker: any) {
