@@ -31,12 +31,7 @@
   <div *ngIf="errorMessage" class="container-sm">
     <ngb-alert type='danger' [hidden]="!errorMessage">No data found for the search results</ngb-alert>
   </div>
-  <div class="container" *ngIf="showSpinner">
-    <div class="text-center">
-      <mat-spinner diameter="75" style="margin: 0 auto;"></mat-spinner>
-    </div>
-  </div>
-  <div class="container" *ngIf="showSpinnerSearch">
+  <div class="container" *ngIf="showSpinner || showSpinnerSearch">
     <div class="text-center">
       <mat-spinner diameter="75" style="margin: 0 auto;"></mat-spinner>
     </div>

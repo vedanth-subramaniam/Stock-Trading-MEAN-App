@@ -177,9 +177,11 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       distinctUntilChanged(), // Only emit when the current value is different from the last
       tap(() => {
         this.autocompleteSearchResults = [];
-        this.showSpinner = true;
       }), // Reset results on new search
       filter(value => value != null && value.trim() != ''), // Filter out empty or null values
+      tap(() => {
+        this.showSpinner = true;
+      }),
       switchMap(value =>
         this.stockService.getAutocompleteAPI(value).pipe(
           catchError(error => {
@@ -684,6 +686,11 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
     this.currentTab = "";
     this.errorMessage = false;
+    this.showSpinner = false;
+    this.showSpinnerSearch = false;
+    console.log(this.showSpinnerSearch);
+    console.log(this.showSpinner);
+    this.onStateChange();
   }
 
   onStateChange() {
