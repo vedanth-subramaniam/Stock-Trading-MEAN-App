@@ -95,6 +95,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   maxVolumeData = Number.MIN_VALUE;
   errorMessage: boolean = false;
   chartOptionsSummary: any;
+  insightsRecommendationChartOptions: any;
+  insightsSurpriseChartOptions: any;
   chartsHourlyResponse: any;
   chartsHourlyDataList: any;
 
@@ -132,6 +134,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       this.currentTab = state.currentTab;
       this.stockPortfolioData = state.stockPortfolioData;
       this.isFavorite = state.isFavorite;
+      this.insightsSurpriseChartOptions = state.insightsSurpriseChartOptions;
+      this.insightsRecommendationChartOptions = state.insightsRecommendationChartOptions;
+      this.aggregateSentimentTable = state.aggregateSentimentTable;
+      this.aggregatedSentimentData = state.aggregatedSentimentData;
       this.stockSearchControl.setValue(state.searchInputValue);
     }
     this.autocompleteSearchResults = [];
@@ -157,6 +163,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   searchStock(searchInput: any) {
+    this.autocompleteSearchResults = [];
     this.stockSearchControl.setValue(searchInput);
     this.tickerSymbol = searchInput.toUpperCase();
     this.errorMessage = false;
@@ -274,27 +281,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         this.insightsResponse = response;
         console.log('Insights Tab Details:', this.insightsResponse);
-        this.aggregatedSentimentData = this.aggregateData(this.insightsResponse.insiderSentiments.data);
-        console.log("Aggregate sentiment is");
-        console.log(this.aggregatedSentimentData);
-        this.aggregateSentimentTable = [
-          {
-            field: 'Total',
-            mspr: this.aggregatedSentimentData.totalMspr,
-            change: this.aggregatedSentimentData.totalChange
-          },
-          {
-            field: 'Positive',
-            mspr: this.aggregatedSentimentData.positiveMspr,
-            change: this.aggregatedSentimentData.positiveChange
-          },
-          {
-            field: 'Negative',
-            mspr: this.aggregatedSentimentData.negativeMspr,
-            change: this.aggregatedSentimentData.negativeChange
-          }
-        ];
-        console.log(this.aggregateSentimentTable);
+        this.aggregateData(this.insightsResponse.insiderSentiments.data);
+        this.getInsightsSurpriseChartOptions();
+        this.getInsightRecommendationsChartOptions();
       }
     });
 
@@ -478,29 +467,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log(this.chartOptions);
   }
 
-  onStateChange() {
-    // When the state changes, save it to the service
-    console.log("Current tab before saving state", this.currentTab);
-    this.stockStateService.saveState({
-      tickerSymbol: this.tickerSymbol,
-      companyInfoResponse: this.companyInfoResponse,
-      companyPeers: this.companyPeers,
-      latestPrice: this.latestPrice,
-      stockProfile: this.stockProfile,
-      newsResponse: this.newsResponse,
-      chartResponse: this.chartResponse,
-      insightsResponse: this.insightsResponse,
-      currentTab: this.currentTab,
-      stockPortfolioData: this.stockPortfolioData,
-      chartHourlyResponse: this.chartsHourlyResponse,
-      chartsHourlyDataList: this.chartsHourlyDataList,
-      chartOptions: this.chartOptions,
-      chartOptionsSummary: this.chartOptionsSummary,
-      searchInputValue: this.stockSearchControl.value,
-      isFavorite: this.isFavorite
-    });
-  }
-
   getHourlyChartsOptions() {
 
     let stockPriceData = this.chartsHourlyDataList.map((item: any) => [item.t, item.o]);
@@ -535,6 +501,124 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     };
   }
 
+  getInsightRecommendationsChartOptions() {
+    console.log(this.insightsResponse.stockRecommendations);
+
+    this.insightsRecommendationChartOptions = {
+      chart: {
+        type: "column",
+        backgroundColor: "#f7f6f7",
+      },
+      title: {
+        text: "Recommendation Trends",
+        align: "center",
+      },
+      xAxis: {
+        categories: this.insightsResponse.stockRecommendations.map((rec: any) => rec.period),
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: "# Analysis",
+        },
+        stackLabels: {
+          enabled: false,
+        },
+      },
+      plotOptions: {
+        column: {
+          stacking: "normal",
+          dataLabels: {
+            enabled: true,
+          },
+        },
+      },
+      series: [
+        {
+          name: "Strong Buy",
+          data: this.insightsResponse.stockRecommendations.map((rec: any) => rec.strongBuy),
+          color: "#1a6334",
+        },
+        {
+          name: "Buy",
+          data: this.insightsResponse.stockRecommendations.map((rec: any) => rec.buy),
+          color: "#22ae50",
+        },
+        {
+          name: "Hold",
+          data: this.insightsResponse.stockRecommendations.map((rec: any) => rec.hold),
+          color: "#ae7c27",
+        },
+        {
+          name: "Sell",
+          data: this.insightsResponse.stockRecommendations.map((rec: any) => rec.sell),
+          color: "#f04e53",
+        },
+        {
+          name: "Strong Sell",
+          data: this.insightsResponse.stockRecommendations.map((rec: any) => rec.strongSell),
+          color: "#752a2a",
+        },
+      ],
+    }
+  }
+
+  getInsightsSurpriseChartOptions() {
+    console.log(this.insightsResponse.companyEarnings);
+
+    let actual_data: any = [];
+    let estimate_data: any = [];
+    let periods: any = [];
+    let surprises: any = [];
+
+    this.insightsResponse.companyEarnings.map((rec: any) => {
+      actual_data.push(rec.actual == null ? 0 : rec.actual);
+      estimate_data.push(rec.estimate == null ? 0 : rec.estimate);
+      periods.push(rec.period);
+      surprises.push("Surprise : " + rec.surprise.toString());
+    });
+
+    this.insightsSurpriseChartOptions = {
+      chart: {
+        backgroundColor: "#f7f6f7",
+        type: "spline",
+      },
+      title: {
+        text: "Historical EPS Surprises",
+      },
+      xAxis: [
+        {
+          categories: periods,
+        },
+        {
+          categories: surprises,
+          offset: 70,
+          linkedTo: 0,
+          opposite: false,
+          labels: {y: -14},
+        },
+      ],
+      yAxis: {
+        title: {
+          text: "Quarterly EPS",
+        },
+      },
+      tooltip: {
+        shared: true,
+      },
+      series: [
+        {
+          name: "Actual",
+          data: actual_data,
+        },
+        {
+          name: "Estimate",
+          data: estimate_data,
+        },
+      ],
+    }
+  }
+
   clearSearch() {
     console.log("Clear search");
     this.stockSearchControl.reset();
@@ -543,6 +627,33 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
     this.currentTab = "";
     this.errorMessage = false;
+  }
+
+  onStateChange() {
+    // When the state changes, save it to the service
+    console.log("Current tab before saving state", this.currentTab);
+    this.stockStateService.saveState({
+      tickerSymbol: this.tickerSymbol,
+      companyInfoResponse: this.companyInfoResponse,
+      companyPeers: this.companyPeers,
+      latestPrice: this.latestPrice,
+      stockProfile: this.stockProfile,
+      newsResponse: this.newsResponse,
+      chartResponse: this.chartResponse,
+      insightsResponse: this.insightsResponse,
+      currentTab: this.currentTab,
+      stockPortfolioData: this.stockPortfolioData,
+      chartHourlyResponse: this.chartsHourlyResponse,
+      chartsHourlyDataList: this.chartsHourlyDataList,
+      chartOptions: this.chartOptions,
+      chartOptionsSummary: this.chartOptionsSummary,
+      insightsRecommendationChartOptions: this.insightsRecommendationChartOptions,
+      insightsSurpriseChartOptions: this.insightsSurpriseChartOptions,
+      searchInputValue: this.stockSearchControl.value,
+      aggregateSentimentTable: this.aggregateSentimentTable,
+      aggregatedSentimentData: this.aggregatedSentimentData,
+      isFavorite: this.isFavorite
+    });
   }
 
   ngOnDestroy() {
@@ -586,7 +697,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   }
 
-  private aggregateData(data: any): any {
+  aggregateData(data: any): any {
+
     let totalMspr = 0;
     let positiveMspr = 0;
     let negativeMspr = 0;
@@ -611,7 +723,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       }
     }
 
-    return {
+    let aggregatedSentimentData = {
       totalMspr,
       positiveMspr,
       negativeMspr,
@@ -619,6 +731,24 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       positiveChange,
       negativeChange
     };
+
+    this.aggregateSentimentTable = [
+      {
+        field: 'Total',
+        mspr: aggregatedSentimentData.totalMspr,
+        change: aggregatedSentimentData.totalChange
+      },
+      {
+        field: 'Positive',
+        mspr: aggregatedSentimentData.positiveMspr,
+        change: aggregatedSentimentData.positiveChange
+      },
+      {
+        field: 'Negative',
+        mspr: aggregatedSentimentData.negativeMspr,
+        change: aggregatedSentimentData.negativeChange
+      }
+    ];
   }
 
 }
