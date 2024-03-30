@@ -60,6 +60,7 @@ import {
   MatRowDef,
   MatTable
 } from "@angular/material/table";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 // Initialize the module
 HC_stock(Highcharts);
@@ -71,7 +72,7 @@ volumeByPrice(Highcharts);
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass, NgbAlert, MatTable, MatHeaderRow, MatRow, MatColumnDef, MatHeaderRowDef, MatRowDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef, DecimalPipe
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass, NgbAlert, MatTable, MatHeaderRow, MatRow, MatColumnDef, MatHeaderRowDef, MatRowDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef, DecimalPipe, MatProgressSpinner
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -108,6 +109,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   chartsHourlyResponse: any;
   chartsHourlyDataList: any;
 
+  showSpinner: boolean = false;
+  showSpinnerSearch: boolean = false;
   aggregatedSentimentData: any;
   aggregateSentimentTable: any;
 
@@ -172,7 +175,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     this.stockSearchControl.valueChanges.pipe(
       debounceTime(700), // Wait for 700ms pause in events
       distinctUntilChanged(), // Only emit when the current value is different from the last
-      tap(() => this.autocompleteSearchResults = []), // Reset results on new search
+      tap(() => {
+        this.autocompleteSearchResults = [];
+        this.showSpinner = true;
+      }), // Reset results on new search
       filter(value => value != null && value.trim() != ''), // Filter out empty or null values
       switchMap(value =>
         this.stockService.getAutocompleteAPI(value).pipe(
@@ -184,6 +190,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         )
       )
     ).subscribe((results: any) => {
+      this.showSpinner = false;
       console.log("Autocomplete results:", results.result);
       this.autocompleteSearchResults = results.result;
       this.autocompleteSearchResults = this.autocompleteSearchResults.filter(option => !option.displaySymbol.includes('.'));
@@ -193,6 +200,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   searchStock(searchInput: any) {
     this.portfolioBoughtAlertMessageBoolean = false;
     this.autocompleteSearchResults = [];
+    this.showSpinner = false;
     this.stockSearchControl.setValue(searchInput);
     this.tickerSymbol = searchInput.toUpperCase();
     this.errorMessage = false;
@@ -200,7 +208,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log('Searching for stock:', this.tickerSymbol);
 
     const apiInterval$ = interval(15000).pipe(startWith(0));
-
+    this.showSpinnerSearch = true;
+    console.log("Mat spinner search");
+    console.log(this.showSpinnerSearch);
     this.subscriptions.add(
       apiInterval$.pipe(
         tap(() => this.stockService.getCompanyCommonDetailsAPI(this.tickerSymbol).subscribe(
@@ -219,8 +229,12 @@ export class StockSearchComponent implements OnInit, OnDestroy {
               this.errorMessage = true;
             }
             console.log('State changes inside company details', this.stockStateService.getState());
+            this.showSpinnerSearch = false;
+
           },
-          error => console.error('Error fetching Company Common Details', error)
+          error => {
+            console.error('Error fetching Company Common Details', error);
+          }
         ))
       ).subscribe({
         next: (response: any) => {
