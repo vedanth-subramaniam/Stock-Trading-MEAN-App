@@ -41,6 +41,16 @@ import {BuyStockDialogComponent} from "../buy-stock-dialog/buy-stock-dialog.comp
 import {response} from "express";
 import {SellStockDialogComponent} from "../sell-stock-dialog/sell-stock-dialog.component";
 import {NgbAlert} from "@ng-bootstrap/ng-bootstrap";
+import {
+  MatCell, MatCellDef,
+  MatColumnDef,
+  MatHeaderCell, MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable
+} from "@angular/material/table";
 
 // Initialize the module
 HC_stock(Highcharts);
@@ -52,7 +62,7 @@ volumeByPrice(Highcharts);
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass, NgbAlert
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass, NgbAlert, MatTable, MatHeaderRow, MatRow, MatColumnDef, MatHeaderRowDef, MatRowDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -88,6 +98,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   chartsHourlyResponse: any;
   chartsHourlyDataList: any;
 
+  aggregatedSentimentData: any;
+  aggregateSentimentTable: any;
 
   walletBalance = 0;
   // References to the template elements
@@ -187,7 +199,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       },
       error: (error: any) => {
         console.log("Cannot retrieve portfolio data");
-        let stockRecord:StockPortfolioRecord;
+        let stockRecord: StockPortfolioRecord;
         if (error.status == "404") {
           this.stockPortfolioData.ticker = this.tickerSymbol;
           this.stockPortfolioData.companyName = this.stockProfile.companyName;
@@ -262,6 +274,27 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         this.insightsResponse = response;
         console.log('Insights Tab Details:', this.insightsResponse);
+        this.aggregatedSentimentData = this.aggregateData(this.insightsResponse.insiderSentiments.data);
+        console.log("Aggregate sentiment is");
+        console.log(this.aggregatedSentimentData);
+        this.aggregateSentimentTable = [
+          {
+            field: 'Total',
+            mspr: this.aggregatedSentimentData.totalMspr,
+            change: this.aggregatedSentimentData.totalChange
+          },
+          {
+            field: 'Positive',
+            mspr: this.aggregatedSentimentData.positiveMspr,
+            change: this.aggregatedSentimentData.positiveChange
+          },
+          {
+            field: 'Negative',
+            mspr: this.aggregatedSentimentData.negativeMspr,
+            change: this.aggregatedSentimentData.negativeChange
+          }
+        ];
+        console.log(this.aggregateSentimentTable);
       }
     });
 
@@ -319,7 +352,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Buying stock:", stock);
     const dialogRef = this.dialog.open(BuyStockDialogComponent, {
       width: '400px',
-      position: {top:'2%'},
+      position: {top: '2%'},
       data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance, latestPrice: this.latestPrice.c}
     });
 
@@ -332,7 +365,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Selling stock:", stock);
     const dialogRef = this.dialog.open(SellStockDialogComponent, {
       width: '400px',
-      position: {top:'2%'},
+      position: {top: '2%'},
       data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance, latestPrice: this.latestPrice}
     });
 
@@ -552,14 +585,50 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Button clicked");
 
   }
+
+  private aggregateData(data: any): any {
+    let totalMspr = 0;
+    let positiveMspr = 0;
+    let negativeMspr = 0;
+    let totalChange = 0;
+    let positiveChange = 0;
+    let negativeChange = 0;
+
+    for (const item of data) {
+      totalMspr += item.mspr;
+      totalChange += item.change;
+
+      if (item.mspr > 0) {
+        positiveMspr += item.mspr;
+      } else {
+        negativeMspr += item.mspr;
+      }
+
+      if (item.change > 0) {
+        positiveChange += item.change;
+      } else {
+        negativeChange += item.change;
+      }
+    }
+
+    return {
+      totalMspr,
+      positiveMspr,
+      negativeMspr,
+      totalChange,
+      positiveChange,
+      negativeChange
+    };
+  }
+
 }
 
-interface StockOption {
+export interface StockOption {
   displaySymbol: string;
   description: string;
 }
 
-interface StockPortfolioRecord {
+export interface StockPortfolioRecord {
   _id: any,
   ticker: string,
   companyName: string,

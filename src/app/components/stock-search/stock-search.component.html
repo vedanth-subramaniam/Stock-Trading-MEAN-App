@@ -170,7 +170,40 @@
   </div>
   <div id="company-insights-section">
     <ng-template #insightsTab>
-      <p>Insights Tab</p>
+      <div class="container-sm mt-3">
+        <div>
+          <div>
+            <div class="text-center">
+              <h3>Insider Sentiments</h3>
+            </div>
+            <div class="container-sm w-50 text-center">
+              <table mat-table [dataSource]="aggregateSentimentTable" class="table table-hover"
+                     *ngIf="aggregateSentimentTable">
+
+                <ng-container matColumnDef="field">
+                  <th mat-header-cell *matHeaderCellDef>{{ tickerSymbol }}</th>
+                  <td mat-cell *matCellDef="let element" class="fw-semibold">{{ element.field }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="mspr">
+                  <th mat-header-cell *matHeaderCellDef>MSPR</th>
+                  <td mat-cell *matCellDef="let element">{{ element.mspr }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="change">
+                  <th mat-header-cell *matHeaderCellDef>Change</th>
+                  <td mat-cell *matCellDef="let element">{{ element.change }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['field', 'mspr', 'change']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['field', 'mspr', 'change']"></tr>
+
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </ng-template>
   </div>
 </div>
