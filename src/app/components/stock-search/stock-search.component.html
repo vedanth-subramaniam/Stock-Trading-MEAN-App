@@ -37,7 +37,8 @@
   </div>
   <div id="common-company-info-section">
     <ng-template #companyInfo>
-      <ngb-alert type='success' [hidden]="!portfolioBoughtAlertMessageBoolean">{{ portfolioBoughtAlertMessage }}</ngb-alert>
+      <ngb-alert type='success' [hidden]="!portfolioBoughtAlertMessageBoolean">{{ portfolioBoughtAlertMessage }}
+      </ngb-alert>
       <ngb-alert type='danger' [hidden]="!portfolioAlertSoldMessageBoolean">{{ tickerSymbol }} sold successfully
       </ngb-alert>
       <ngb-alert type='success' [hidden]="!wishlistAlertMessageAddedBoolean">{{ tickerSymbol }} added to wishlist
@@ -78,9 +79,14 @@
               <div class="p-1"
                    [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">{{ latestPrice?.c }}
               </div>
-              <div class="p-1"
-                   [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">{{ latestPrice?.d }}
-                ({{ latestPrice?.dp }})
+              <div>
+                <i class="p-1"
+                   [ngClass]="{'negative bi bi-caret-down-fill': !getProfitOrLossCP(), 'bi bi-caret-up-fill positive': getProfitOrLossCP()}">
+                </i>
+                <div class="p-1"
+                     [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">{{ latestPrice?.d }}
+                  ({{ latestPrice?.dp + "%"}})
+                </div>
               </div>
               <div class="p-1 fs-6">{{ latestPrice?.t * 1000 | date:'medium' }}</div>
             </div>
