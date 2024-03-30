@@ -4,13 +4,15 @@ import {CurrencyPipe, NgForOf} from "@angular/common";
 import {BuyStockDialogComponent} from "../buy-stock-dialog/buy-stock-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {SellStockDialogComponent} from "../sell-stock-dialog/sell-stock-dialog.component";
+import {NgbAlert} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-stock-portfolio',
   standalone: true,
   imports: [
     CurrencyPipe,
-    NgForOf
+    NgForOf,
+    NgbAlert
   ],
   templateUrl: './stock-portfolio.component.html',
   styleUrl: './stock-portfolio.component.css'
@@ -50,6 +52,7 @@ export class StockPortfolioComponent implements OnInit {
     console.log("Buying stock:", stock);
     const dialogRef = this.dialog.open(BuyStockDialogComponent, {
       width: '400px',
+      position: {top:'2%'},
       data: {stock: stock, walletBalance: this.walletBalance, latestPrice: stock.currentPrice}
     });
 
@@ -62,6 +65,7 @@ export class StockPortfolioComponent implements OnInit {
     console.log("Selling stock:", stock);
     const dialogRef = this.dialog.open(SellStockDialogComponent, {
       width: '400px',
+      position: {top:'2%'},
       data: {stock: stock, walletBalance: this.walletBalance, latestPrice: stock.currentPrice}
     });
 

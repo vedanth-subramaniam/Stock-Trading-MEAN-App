@@ -40,6 +40,7 @@ import {MatIcon} from "@angular/material/icon";
 import {BuyStockDialogComponent} from "../buy-stock-dialog/buy-stock-dialog.component";
 import {response} from "express";
 import {SellStockDialogComponent} from "../sell-stock-dialog/sell-stock-dialog.component";
+import {NgbAlert} from "@ng-bootstrap/ng-bootstrap";
 
 // Initialize the module
 HC_stock(Highcharts);
@@ -51,7 +52,7 @@ volumeByPrice(Highcharts);
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass, NgbAlert
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -185,8 +186,19 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         console.log("Stock Portfolio Data", this.stockPortfolioData);
       },
       error: (error: any) => {
+        console.log("Cannot retrieve portfolio data");
+        let stockRecord:StockPortfolioRecord;
         if (error.status == "404") {
+          this.stockPortfolioData.ticker = this.tickerSymbol;
+          this.stockPortfolioData.companyName = this.stockProfile.companyName;
+          this.stockPortfolioData.avgCostPerShare = 0;
+          this.stockPortfolioData.totalCost = 0;
           this.stockPortfolioData.quantity = 0;
+          this.stockPortfolioData.change = 0;
+          this.stockPortfolioData.currentPrice = 0;
+          this.stockPortfolioData.marketValue = 0;
+
+          console.log("Inside if");
         }
       }
     });
@@ -295,13 +307,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     const dialogConfig = new MatDialogConfig();
 
-    // Set the position of the dialog
-    dialogConfig.position = {top: '2%'}; // You can adjust '0' to another value to suit your needs
-    // Add other configuration settings as needed, like width, height, etc.
+    dialogConfig.position = {top: '2%'};
     dialogConfig.width = '500px';
     dialogConfig.height = '400px';
-
-    // If you want to add custom classes for styling, use the panelClass property
     dialogConfig.panelClass = 'my-custom-dialog';
     dialogConfig.data = newsDetail;
     this.dialog.open(NewsDetailsDialogComponent, dialogConfig);
@@ -311,6 +319,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Buying stock:", stock);
     const dialogRef = this.dialog.open(BuyStockDialogComponent, {
       width: '400px',
+      position: {top:'2%'},
       data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance, latestPrice: this.latestPrice.c}
     });
 
@@ -323,6 +332,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     console.log("Selling stock:", stock);
     const dialogRef = this.dialog.open(SellStockDialogComponent, {
       width: '400px',
+      position: {top:'2%'},
       data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance, latestPrice: this.latestPrice}
     });
 

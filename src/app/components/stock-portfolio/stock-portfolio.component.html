@@ -3,6 +3,11 @@
   <div class="portfolio-heading mb-4">
     <h1>My Portfolio</h1>
     <h3>Wallet Balance: {{ walletBalance | currency }}</h3>
+
+    <ngb-alert [dismissible]="false" [hidden]="portFolioDataList.length > 0" class="text-center">
+      Currently you don't have any stock
+    </ngb-alert>
+
   </div>
   <div class="stock-portfolio mt-3">
     <div *ngFor="let stock of portFolioDataList" class="card stock-card mb-3">

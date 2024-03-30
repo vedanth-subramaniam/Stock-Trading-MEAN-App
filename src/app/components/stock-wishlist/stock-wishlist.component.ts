@@ -3,6 +3,7 @@ import {StockApiService} from "../../services/stock-api.service";
 import {CurrencyPipe, DecimalPipe, NgClass, NgForOf} from "@angular/common";
 import {computeStartOfLinePositions} from "@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file";
 import {response} from "express";
+import {NgbAlert} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-stock-wishlist',
@@ -11,7 +12,8 @@ import {response} from "express";
     NgClass,
     CurrencyPipe,
     DecimalPipe,
-    NgForOf
+    NgForOf,
+    NgbAlert
   ],
   templateUrl: './stock-wishlist.component.html',
   styleUrl: './stock-wishlist.component.css'
@@ -37,7 +39,6 @@ export class StockWishlistComponent implements OnInit {
             console.log("Stock from API values", stock);
           }
         });
-        // Update the price for all
         console.log(stock);
       }
     });
