@@ -80,7 +80,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   companyPeers: any;
   latestPrice: any;
   stockProfile: any;
-  stockPortfolioData: any;
 
   newsResponse!: any;
   chartResponse!: any;
@@ -102,6 +101,17 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   aggregatedSentimentData: any;
   aggregateSentimentTable: any;
+
+  portfolioBoughtAlertMessage: any;
+  portfolioAlertSoldMessage: any;
+  wishlistAlertMessageAdded: any;
+  wishlistAlertMessageRemoved: any;
+  portfolioBoughtAlertMessageBoolean: boolean = false;
+  portfolioAlertSoldMessageBoolean: boolean = false;
+  wishlistAlertMessageAddedBoolean: boolean = false;
+  wishlistAlertMessageRemovedBoolean: boolean = false;
+
+  stockPortfolioData: any;
 
   walletBalance = 0;
   // References to the template elements
@@ -182,6 +192,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
             this.latestPrice = this.companyInfoResponse.latestPrice;
             this.companyPeers = this.companyInfoResponse.companyPeers;
             this.currentTab = "Summary";
+            fetchPortfolioAndWallet();
             this.onStateChange();
             if (this.companyInfoResponse.companyPeers.length == 0) {
               console.log("Empty");
@@ -198,39 +209,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         }
       })
     );
-
-    this.stockService.getSingleRecordPortfolioDB(this.tickerSymbol).subscribe({
-      next: (response: any) => {
-        this.stockPortfolioData = response;
-        console.log("Stock Portfolio Data", this.stockPortfolioData);
-      },
-      error: (error: any) => {
-        console.log("Cannot retrieve portfolio data");
-        let stockRecord: StockPortfolioRecord;
-        if (error.status == "404") {
-          this.stockPortfolioData.ticker = this.tickerSymbol;
-          this.stockPortfolioData.companyName = this.stockProfile.companyName;
-          this.stockPortfolioData.avgCostPerShare = 0;
-          this.stockPortfolioData.totalCost = 0;
-          this.stockPortfolioData.quantity = 0;
-          this.stockPortfolioData.change = 0;
-          this.stockPortfolioData.currentPrice = 0;
-          this.stockPortfolioData.marketValue = 0;
-
-          console.log("Inside if");
-        }
-      }
-    });
-
-    this.stockService.getTickerWishListDB(this.tickerSymbol).subscribe({
-      next: (response: any) => {
-        console.log("Stock has been fetched from wishlist");
-        this.isFavorite = true;
-      },
-      error: (error: any) => {
-        this.isFavorite = false;
-      }
-    })
 
     this.stockService.getChartsHourlyDetailsAPI(this.tickerSymbol).subscribe({
       next: (response) => {
@@ -287,12 +265,45 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.stockService.getWalletBalanceDB().subscribe({
-      next: (response: any) => {
-        console.log("Wallet fetched from DB");
-        this.walletBalance = response.balance;
-      }
-    });
+    const fetchPortfolioAndWallet = () => {
+      this.stockService.getSingleRecordPortfolioDB(this.tickerSymbol).subscribe({
+        next: (response: any) => {
+          this.stockPortfolioData = response;
+          console.log("Stock Portfolio Data", this.stockPortfolioData);
+          this.onStateChange();
+        },
+        error: (error: any) => {
+          console.log("Error in fetching stock portfolio data for company", error);
+          this.stockPortfolioData = {
+            ticker: this.tickerSymbol,
+            companyName: this.stockProfile?.name,
+            quantity: 0,
+            avgCostPerShare: 0,
+            totalCost: 0,
+            change: 0,
+            currentPrice: 0,
+            marketValue: 0
+          };
+        }
+      });
+
+      this.stockService.getTickerWishListDB(this.tickerSymbol).subscribe({
+        next: (response: any) => {
+          console.log("Stock has been fetched from wishlist");
+          this.isFavorite = true;
+        },
+        error: (error: any) => {
+          this.isFavorite = false;
+        }
+      });
+      this.stockService.getWalletBalanceDB().subscribe({
+        next: (response: any) => {
+          console.log("Wallet fetched from DB");
+          this.walletBalance = response.balance;
+        }
+      });
+    }
+
     this.onStateChange();
     console.log('State changes', this.stockStateService.getState());
   }
@@ -325,6 +336,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     return difference > (5 * 60 * 1000);
   }
 
+  getProfitOrLossCP() {
+    return this.latestPrice?.d >= 0;
+  }
+
   openDialog(newsDetail: any): void {
 
     const dialogConfig = new MatDialogConfig();
@@ -347,6 +362,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      if (result.show) {
+        this.portfolioBoughtAlertMessage = result.data;
+        this.portfolioBoughtAlertMessageBoolean = true;
+      }
     });
   }
 
@@ -360,6 +379,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      if (result.show) {
+        this.portfolioAlertSoldMessage = result.data;
+        this.portfolioAlertSoldMessageBoolean = true;
+      }
     });
   }
 
@@ -470,7 +493,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   getHourlyChartsOptions() {
 
     let stockPriceData = this.chartsHourlyDataList.map((item: any) => [item.t, item.o]);
-
+    let chartColour = this.getProfitOrLossCP() ? 'FF0000FF' : '008000FF';
     this.chartOptionsSummary = {
       chart: {
         type: 'line'
@@ -495,9 +518,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       },
       series: [{
         name: this.chartsHourlyResponse.ticker + ' Stock Price',
-        data: stockPriceData // data should be filled in here
+        data: stockPriceData// data should be filled in here.
       }]
-      // other chart options
     };
   }
 

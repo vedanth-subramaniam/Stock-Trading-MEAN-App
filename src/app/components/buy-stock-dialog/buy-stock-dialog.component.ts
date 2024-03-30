@@ -45,7 +45,7 @@ export class BuyStockDialogComponent implements OnInit {
     public stockService: StockApiService
   ) {
     this.stockService.getWalletBalanceDB().subscribe({
-      next:(response: any) => this.walletBalance = response.balance,
+      next: (response: any) => this.walletBalance = response.balance,
     });
     this.walletBalance = data.walletBalance;
     this.updateTotal(); // Initialize total
@@ -69,12 +69,13 @@ export class BuyStockDialogComponent implements OnInit {
       this.stockService.updateWalletBalanceDB(this.walletBalance).subscribe({
         next: () => console.log("Updated wallet price")
       })
-      this.dialogRef.close(this.quantity);
+      this.dialogRef.close({data:  this.data.stock.ticker + " was bought successfully", show: true});
     }
   }
 
   ngOnInit(): void {
     console.log("From Mat Dialog");
+    console.log(this.data);
     console.log(this.data.stock);
     console.log(this.data.walletBalance);
   }

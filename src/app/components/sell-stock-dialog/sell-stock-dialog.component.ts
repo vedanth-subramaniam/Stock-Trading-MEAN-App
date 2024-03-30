@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {CurrencyPipe, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
@@ -32,7 +32,7 @@ import {MatInput} from "@angular/material/input";
   templateUrl: './sell-stock-dialog.component.html',
   styleUrl: './sell-stock-dialog.component.css'
 })
-export class SellStockDialogComponent {
+export class SellStockDialogComponent implements OnInit{
   quantity = 1;
   total = 0;
   walletBalance: number;
@@ -53,6 +53,7 @@ export class SellStockDialogComponent {
     if (this.total <= this.walletBalance) {
       this.dialogRef.close(this.quantity);
     }
+    this.dialogRef.close({data:  this.data.stock.ticker + " was sold successfully", show: true});
   }
 
   ngOnInit(): void {

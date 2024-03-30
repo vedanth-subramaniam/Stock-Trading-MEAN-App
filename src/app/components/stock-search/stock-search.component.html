@@ -37,6 +37,13 @@
   </div>
   <div id="common-company-info-section">
     <ng-template #companyInfo>
+      <ngb-alert type='success' [hidden]="!portfolioBoughtAlertMessageBoolean">{{ portfolioBoughtAlertMessage }}</ngb-alert>
+      <ngb-alert type='danger' [hidden]="!portfolioAlertSoldMessageBoolean">{{ tickerSymbol }} sold successfully
+      </ngb-alert>
+      <ngb-alert type='success' [hidden]="!wishlistAlertMessageAddedBoolean">{{ tickerSymbol }} added to wishlist
+      </ngb-alert>
+      <ngb-alert type='danger' [hidden]="!wishlistAlertMessageRemovedBoolean">{{ tickerSymbol }} removed from wishlist
+      </ngb-alert>
       <div class="container-sm">
         <div class="d-sm-flex justify-content-sm-evenly company-info-card fs-5">
           <div>
@@ -69,10 +76,10 @@
           <div>
             <div class="p-1 stock-body">
               <div class="p-1"
-                   [ngClass]="{'negative': latestPrice?.d < 0, 'positive': latestPrice?.d >= 0}">{{ latestPrice?.c }}
+                   [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">{{ latestPrice?.c }}
               </div>
               <div class="p-1"
-                   [ngClass]="{'negative': latestPrice?.d < 0, 'positive': latestPrice?.d >= 0}">{{ latestPrice?.d }}
+                   [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">{{ latestPrice?.d }}
                 ({{ latestPrice?.dp }})
               </div>
               <div class="p-1 fs-6">{{ latestPrice?.t * 1000 | date:'medium' }}</div>
@@ -203,18 +210,18 @@
           </div>
         </div>
         <div class="container-sm d-sm-flex">
-        <highcharts-chart
-          [Highcharts]="Highcharts"
-          [options]="insightsRecommendationChartOptions"
-          style="width: 50%; height: 400px; display: inline;"
-          class="m-2"
-        ></highcharts-chart>
-        <highcharts-chart
-          [Highcharts]="Highcharts"
-          [options]="insightsSurpriseChartOptions"
-          style="width: 50%; height: 400px; display: inline"
-          class="m-2"
-        ></highcharts-chart>
+          <highcharts-chart
+            [Highcharts]="Highcharts"
+            [options]="insightsRecommendationChartOptions"
+            style="width: 50%; height: 400px; display: inline;"
+            class="m-2"
+          ></highcharts-chart>
+          <highcharts-chart
+            [Highcharts]="Highcharts"
+            [options]="insightsSurpriseChartOptions"
+            style="width: 50%; height: 400px; display: inline"
+            class="m-2"
+          ></highcharts-chart>
         </div>
       </div>
 
