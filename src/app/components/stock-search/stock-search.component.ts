@@ -12,7 +12,16 @@ import {
   switchMap,
   tap
 } from "rxjs";
-import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf, NgOptimizedImage, NgTemplateOutlet} from "@angular/common";
+import {
+  AsyncPipe,
+  DatePipe,
+  DecimalPipe,
+  NgClass,
+  NgForOf,
+  NgIf,
+  NgOptimizedImage,
+  NgTemplateOutlet
+} from "@angular/common";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
@@ -62,7 +71,7 @@ volumeByPrice(Highcharts);
   selector: 'app-stock-search',
   standalone: true,
   imports: [
-    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass, NgbAlert, MatTable, MatHeaderRow, MatRow, MatColumnDef, MatHeaderRowDef, MatRowDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef
+    FormsModule, HttpClientModule, ReactiveFormsModule, NgForOf, NgIf, MatAutocomplete, MatOption, AsyncPipe, MatFormField, MatAutocompleteTrigger, MatInput, DatePipe, NgOptimizedImage, MatTabGroup, MatTab, NgTemplateOutlet, MatCard, MatCardHeader, MatCardTitle, MatCardTitleGroup, MatCardContent, MatCardSubtitle, MatCardSmImage, HighchartsChartModule, MatIcon, NgClass, NgbAlert, MatTable, MatHeaderRow, MatRow, MatColumnDef, MatHeaderRowDef, MatRowDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef, DecimalPipe
   ],
   templateUrl: './stock-search.component.html',
   styleUrl: './stock-search.component.css'
@@ -150,6 +159,15 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       this.aggregatedSentimentData = state.aggregatedSentimentData;
       this.stockSearchControl.setValue(state.searchInputValue);
     }
+    this.stockService.getTickerWishListDB(this.tickerSymbol).subscribe({
+      next: (response: any) => {
+        console.log("Stock has been fetched from wishlist");
+        this.isFavorite = true;
+      },
+      error: (error: any) => {
+        this.isFavorite = false;
+      }
+    });
     this.autocompleteSearchResults = [];
     this.stockSearchControl.valueChanges.pipe(
       debounceTime(700), // Wait for 700ms pause in events
@@ -173,6 +191,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   searchStock(searchInput: any) {
+    this.portfolioBoughtAlertMessageBoolean = false;
     this.autocompleteSearchResults = [];
     this.stockSearchControl.setValue(searchInput);
     this.tickerSymbol = searchInput.toUpperCase();
@@ -354,6 +373,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   buyStock(stock: any) {
     console.log("Buying stock:", stock);
+    this.portfolioBoughtAlertMessageBoolean = false;
     const dialogRef = this.dialog.open(BuyStockDialogComponent, {
       width: '400px',
       position: {top: '2%'},
@@ -362,6 +382,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      this.portfolioBoughtAlertMessage = false;
       if (result.show) {
         this.portfolioBoughtAlertMessage = result.data;
         this.portfolioBoughtAlertMessageBoolean = true;
@@ -701,6 +722,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
           "percentage": this.latestPrice.dp
         }
       }
+      this.wishlistAlertMessageAddedBoolean = true;
       this.stockService.postIntoWishListData(stockData).subscribe({
         next: (response: any) => {
           console.log(response);
@@ -708,6 +730,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         }
       });
     } else {
+      this.wishlistAlertMessageRemovedBoolean = true;
       this.stockService.deleteFromWishlistDB(this.tickerSymbol).subscribe({
         next: (response: any) => {
           console.log("Removed from wishlist");
@@ -773,6 +796,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     ];
   }
 
+  protected readonly Date = Date;
 }
 
 export interface StockOption {
