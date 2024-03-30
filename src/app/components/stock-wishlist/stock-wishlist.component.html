@@ -4,13 +4,13 @@
     Currently you don't have any stock in your watchlist
   </ngb-alert>
   <div *ngFor="let stock of stocks; let i = index" class="card mb-3">
-    <div class="card-body">
+    <div class="card-body" (click)="navigateToSearch(stock.stockTicker)">
       <button type="button" class="close" aria-label="Close" (click)="deleteStock(stock._id, stock.stockTicker, i)">
         <span aria-hidden="true">&times;</span>
       </button>
       <div class="row align-items-center">
         <div class="col">
-          <h5 class="watch-card-title" (click)="navigateToSearch(stock.stockTicker)">{{ stock.stockTicker }}</h5>
+          <h5 class="watch-card-title">{{ stock.stockTicker }}</h5>
           <h6 class="watch-card-subtitle mb-2 text-muted">{{ stock.companyName }}</h6>
         </div>
         <div class="col text-right">
