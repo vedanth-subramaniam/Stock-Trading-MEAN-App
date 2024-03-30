@@ -55,7 +55,7 @@ export class SellStockDialogComponent implements OnInit {
   }
 
   confirmPurchase() {
-    if (this.total <= this.walletBalance) {
+    if (this.quantity <= this.data.stock.quantity) {
       this.data.stock.quantity -= this.quantity;
       this.data.stock.totalCost -= this.total;
       this.walletBalance += this.total;

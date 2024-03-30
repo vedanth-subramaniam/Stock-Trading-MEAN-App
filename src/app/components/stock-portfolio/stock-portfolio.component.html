@@ -10,7 +10,7 @@
 
   </div>
   <div class="stock-portfolio mt-3">
-    <div *ngFor="let stock of portFolioDataList" class="card stock-card mb-3">
+    <div *ngFor="let stock of portFolioDataList; let i = index" class="card stock-card mb-3">
       <div class="card-header text-white">
         <div class="stock-heading">{{ stock.ticker }} {{ stock.companyName }}</div>
       </div>
@@ -29,8 +29,8 @@
         </div>
         <div class="row bg-gradient">
           <div class="col-md-12 button-actions">
-            <button class="btn btn-primary" (click)="buyStock(stock)">Buy</button>
-            <button class="btn btn-danger" (click)="sellStock(stock)">Sell</button>
+            <button class="btn btn-primary" (click)="buyStock(stock, i)">Buy</button>
+            <button class="btn btn-danger" (click)="sellStock(stock, i)">Sell</button>
           </div>
         </div>
       </div>
