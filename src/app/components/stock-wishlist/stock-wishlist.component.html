@@ -10,7 +10,7 @@
       </button>
       <div class="row align-items-center">
         <div class="col">
-          <h5 class="watch-card-title">{{ stock.stockTicker }}</h5>
+          <h5 class="watch-card-title" (click)="navigateToSearch(stock.stockTicker)">{{ stock.stockTicker }}</h5>
           <h6 class="watch-card-subtitle mb-2 text-muted">{{ stock.companyName }}</h6>
         </div>
         <div class="col text-right">

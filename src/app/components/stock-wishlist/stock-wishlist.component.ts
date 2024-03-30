@@ -4,6 +4,7 @@ import {CurrencyPipe, DecimalPipe, NgClass, NgForOf} from "@angular/common";
 import {computeStartOfLinePositions} from "@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file";
 import {response} from "express";
 import {NgbAlert} from "@ng-bootstrap/ng-bootstrap";
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-stock-wishlist',
@@ -21,7 +22,7 @@ import {NgbAlert} from "@ng-bootstrap/ng-bootstrap";
 export class StockWishlistComponent implements OnInit {
   stocks: Stock[] = [];
 
-  constructor(private stockService: StockApiService) {
+  constructor(private stockService: StockApiService, private router: Router) {
   }
 
   ngOnInit() {
@@ -42,6 +43,10 @@ export class StockWishlistComponent implements OnInit {
         console.log(stock);
       }
     });
+  }
+
+  navigateToSearch(companyName: string): void {
+    this.router.navigate(['/search'], {queryParams: {ticker: companyName}});
   }
 
   deleteStock(id: any, ticker: any, index: any) {

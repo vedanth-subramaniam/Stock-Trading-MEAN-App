@@ -61,6 +61,7 @@ import {
   MatTable
 } from "@angular/material/table";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {ActivatedRoute, Router} from "@angular/router";
 
 // Initialize the module
 HC_stock(Highcharts);
@@ -132,10 +133,17 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   @ViewChild('chartsTab') chartsTemplate!: TemplateRef<any>;
   @ViewChild('insightsTab') insightsTemplate!: TemplateRef<any>;
 
-  constructor(private stockService: StockApiService, public dialog: MatDialog, protected stockStateService: StockStateService) {
+  constructor(private stockService: StockApiService, public dialog: MatDialog, protected stockStateService: StockStateService, private activatedRoute: ActivatedRoute, private router: Router) {
   }
 
   ngOnInit() {
+
+    this.activatedRoute.queryParams.subscribe(params => {
+      const companyName = params['ticker'];
+      if (companyName) {
+        this.searchStock(companyName);
+      }
+    });
 
     console.log("Search component Init");
     const state = this.stockStateService.getState();
@@ -199,6 +207,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     });
   }
 
+  changeRoute(searchInput:any){
+    this.router.navigate(['/search'], {queryParams: {ticker: searchInput}});
+  }
   searchStock(searchInput: any) {
     this.portfolioBoughtAlertMessageBoolean = false;
     this.autocompleteSearchResults = [];
