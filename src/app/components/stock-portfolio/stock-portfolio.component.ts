@@ -58,6 +58,7 @@ export class StockPortfolioComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      this.walletBalance = result.wallet;
     });
   }
 
@@ -71,6 +72,7 @@ export class StockPortfolioComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      this.walletBalance = result.wallet;
     });
   }
 }

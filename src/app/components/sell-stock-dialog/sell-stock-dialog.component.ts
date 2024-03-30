@@ -12,6 +12,7 @@ import {
 } from "@angular/material/dialog";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
+import {StockApiService} from "../../services/stock-api.service";
 
 @Component({
   selector: 'app-sell-stock-dialog',
@@ -32,16 +33,20 @@ import {MatInput} from "@angular/material/input";
   templateUrl: './sell-stock-dialog.component.html',
   styleUrl: './sell-stock-dialog.component.css'
 })
-export class SellStockDialogComponent implements OnInit{
+export class SellStockDialogComponent implements OnInit {
   quantity = 1;
   total = 0;
   walletBalance: number;
 
   constructor(
     public dialogRef: MatDialogRef<SellStockDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    public stockService: StockApiService
   ) {
     this.walletBalance = data.walletBalance;
+    this.stockService.getWalletBalanceDB().subscribe({
+      next: (response: any) => this.walletBalance = response.balance,
+    });
     this.updateTotal(); // Initialize total
   }
 
@@ -51,9 +56,20 @@ export class SellStockDialogComponent implements OnInit{
 
   confirmPurchase() {
     if (this.total <= this.walletBalance) {
-      this.dialogRef.close(this.quantity);
+      this.data.stock.quantity -= this.quantity;
+      this.data.stock.totalCost -= this.total;
+      this.walletBalance += this.total;
+      console.log("Selling the stock");
+      console.log(this.data.stock);
+      this.stockService.postIntoPortfolioData(this.data.stock).subscribe({
+        next: () => console.log("Updated stock data"),
+        error: (error: any) => console.log("Some error occurred while buying", error)
+      });
+      this.stockService.updateWalletBalanceDB(this.walletBalance).subscribe({
+        next: () => console.log("Updated wallet price")
+      });
+      this.dialogRef.close({data: this.data.stock.ticker + " was sold successfully", show: true, wallet:this.walletBalance});
     }
-    this.dialogRef.close({data:  this.data.stock.ticker + " was sold successfully", show: true});
   }
 
   ngOnInit(): void {

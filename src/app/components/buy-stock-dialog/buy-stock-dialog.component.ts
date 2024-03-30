@@ -44,10 +44,11 @@ export class BuyStockDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public stockService: StockApiService
   ) {
+    this.walletBalance = data.walletBalance;
     this.stockService.getWalletBalanceDB().subscribe({
       next: (response: any) => this.walletBalance = response.balance,
     });
-    this.walletBalance = data.walletBalance;
+    // this.walletBalance = data.walletBalance;
     this.updateTotal(); // Initialize total
   }
 
@@ -69,7 +70,7 @@ export class BuyStockDialogComponent implements OnInit {
       this.stockService.updateWalletBalanceDB(this.walletBalance).subscribe({
         next: () => console.log("Updated wallet price")
       })
-      this.dialogRef.close({data:  this.data.stock.ticker + " was bought successfully", show: true});
+      this.dialogRef.close({data:  this.data.stock.ticker + " was bought successfully", show: true, wallet:this.walletBalance});
     }
   }
 
