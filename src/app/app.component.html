@@ -9,13 +9,13 @@
           <a class="navbar-brand">Stock Search</a>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav ms-auto">
-              <button type="button" class="btn nav-link" [class.active]="showComponent === 'search'"
+              <button type="button" class="btn nav-link"
                       (click)="showComponent='search'" routerLink="/search" routerLinkActive="active">Search
               </button>
-              <button type="button" class="btn nav-link" [class.active]="showComponent === 'wishlist'"
+              <button type="button" class="btn nav-link"
                       (click)="showComponent='wishlist'" routerLink="/watchlist" routerLinkActive="active">Watchlist
               </button>
-              <button type="button" class="btn nav-link" [class.active]="showComponent === 'portfolio'"
+              <button type="button" class="btn nav-link"
                       (click)="showComponent='portfolio'" routerLink="/portfolio" routerLinkActive="active">Portfolio
               </button>
             </div>

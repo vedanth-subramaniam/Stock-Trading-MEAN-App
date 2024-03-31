@@ -50,52 +50,50 @@
       </ngb-alert>
       <ngb-alert type='danger' [hidden]="!wishlistAlertMessageRemovedBoolean">{{ tickerSymbol }} removed from wishlist
       </ngb-alert>
-      <div class="container-sm">
-        <div class="d-sm-flex justify-content-sm-evenly company-info-card fs-5">
-          <div>
-            <div>
-              <div class="p-1">
-                {{ stockProfile?.ticker }}
-                <i [ngClass]="{'bi bi-star': !isFavorite, 'bi bi-star-fill text-warning': isFavorite}"
-                   class="favorite-icon"
-                   (click)="toggleFavorite()"></i>
-              </div>
-              <div class="p-1">{{ stockProfile?.name }}</div>
-              <div class="p-1 fs-6">{{ stockProfile?.exchange }}</div>
-              <div class="d-md-flex flex-row justify-content-center p-1">
-                <button class="btn btn-success p-2 m-2 w-25" (click)="buyStock(stockPortfolioData)">Buy</button>
-                <button class="btn btn-danger p-2 m-2 w-25" *ngIf="stockPortfolioData?.quantity > 0"
-                        (click)="sellStock(stockPortfolioData)">Sell
-                </button>
-              </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-4 text-center">
+            <div class="p-1 fs-5">
+              {{ stockProfile?.ticker }}
+              <i [ngClass]="{'bi bi-star': !isFavorite, 'bi bi-star-fill text-warning': isFavorite}"
+                 class="favorite-icon"
+                 (click)="toggleFavorite()"></i>
+            </div>
+            <div class="p-1 fs-5">{{ stockProfile?.name }}</div>
+            <div class="p-1 fs-6">{{ stockProfile?.exchange }}</div>
+            <div class="d-md-flex flex-row justify-content-center p-1">
+              <button class="btn btn-success p-2 m-2 w-25" (click)="buyStock(stockPortfolioData)">Buy
+              </button>
+              <button class="btn btn-danger p-2 m-2 w-25" *ngIf="stockPortfolioData?.quantity > 0"
+                      (click)="sellStock(stockPortfolioData)">Sell
+              </button>
             </div>
           </div>
-          <div>
+          <div class="col-4">
             <div class="text-center p-1">
               <img class="stock-company-logo" [src]="stockProfile?.logo">
             </div>
             <div class="text-center p-1">
-              <div *ngIf="getMarketStatus()" class="text-danger ">Market Closed
-                on {{ latestPrice?.t * 1000 | date: 'medium' }}
+              <div *ngIf="getMarketStatus()" class="text-danger fs-6 ">Market Closed
+                on {{ latestPrice?.t * 1000 | date:"YYYY-mm-dd hh:mm:ss" }}
               </div>
               <div *ngIf="!getMarketStatus()" class="text-success">Market is Open</div>
             </div>
           </div>
-          <div>
+          <div class="col-4 text-center">
             <div class="p-1 stock-body">
-              <div class="p-1"
+              <div class="p-1 fs-5"
                    [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">{{ latestPrice?.c }}
               </div>
               <div>
-                <i class="p-1"
-                   [ngClass]="{'negative bi bi-caret-down-fill': !getProfitOrLossCP(), 'bi bi-caret-up-fill positive': getProfitOrLossCP()}">
-                </i>
-                <div class="p-1"
-                     [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">{{ latestPrice?.d }}
-                  ({{ latestPrice?.dp | number:'1.0-2' }}%)
+                <div class="p-1 fs-5"
+                     [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">
+                  <i
+                    [ngClass]="{'negative bi bi-caret-down-fill': !getProfitOrLossCP(), 'bi bi-caret-up-fill positive': getProfitOrLossCP()}">
+                  </i>{{ latestPrice?.d }}({{ latestPrice?.dp | number:'1.0-2' }}%)
                 </div>
               </div>
-              <div class="p-1 fs-6">{{ Date() }}</div>
+              <div class="p-1 fs-6 fw-normal">{{ Date() | date:"YYYY-mm-dd hh:mm:ss" }}</div>
             </div>
           </div>
         </div>
@@ -145,11 +143,11 @@
         </div>
         <div class="row-cols-6 w-100">
           <div class="w-100 text-center">
-            <highcharts-chart
-              [Highcharts]="Highcharts"
-              [options]="chartOptionsSummary"
-              style="width: 100%; height: 400px; display: inline;">
-            </highcharts-chart>
+            <!--            <highcharts-chart-->
+            <!--              [Highcharts]="Highcharts"-->
+            <!--              [options]="chartOptionsSummary"-->
+            <!--              style="width: 100%; height: 400px; display: inline;">-->
+            <!--            </highcharts-chart>-->
           </div>
         </div>
       </div>
@@ -190,18 +188,18 @@
   </div>
   <div id="company-insights-section">
     <ng-template #insightsTab>
-      <div class="container-sm mt-3">
+      <div class="container-fluid mt-3 company-insights">
         <div>
           <div>
-            <div class="text-center">
-              <h3>Insider Sentiments</h3>
+            <div class="text-center fs-4">
+              <div>Insider Sentiments</div>
             </div>
-            <div class="container-sm text-center w-50">
+            <div class="container text-center p-md-5 m-md-5">
               <table mat-table [dataSource]="aggregateSentimentTable" class="table table-hover"
                      *ngIf="aggregateSentimentTable">
 
                 <ng-container matColumnDef="field">
-                  <th mat-header-cell *matHeaderCellDef>{{ tickerSymbol }}</th>
+                  <th mat-header-cell *matHeaderCellDef>{{ stockProfile?.name }}</th>
                   <td mat-cell *matCellDef="let element" class="fw-semibold">{{ element.field }}</td>
                 </ng-container>
 
@@ -222,19 +220,23 @@
             </div>
           </div>
         </div>
-        <div class="container-sm d-sm-flex">
-          <highcharts-chart
-            [Highcharts]="Highcharts"
-            [options]="insightsRecommendationChartOptions"
-            style="width: 50%; height: 400px; display: inline;"
-            class="m-2"
-          ></highcharts-chart>
-          <highcharts-chart
-            [Highcharts]="Highcharts"
-            [options]="insightsSurpriseChartOptions"
-            style="width: 50%; height: 400px; display: inline"
-            class="m-2"
-          ></highcharts-chart>
+        <div class="container">
+          <div class="row">
+            <div class="col-12 col-md-6">
+              <highcharts-chart
+                [Highcharts]="Highcharts"
+                [options]="insightsRecommendationChartOptions"
+                style="width: 100%; height: 400px; display: block"
+              ></highcharts-chart>
+            </div>
+            <div class="col-12 col-md-6">
+              <highcharts-chart
+                [Highcharts]="Highcharts"
+                [options]="insightsSurpriseChartOptions"
+                style="width: 100%; height: 400px; display: block"
+              ></highcharts-chart>
+            </div>
+          </div>
         </div>
       </div>
 

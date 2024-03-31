@@ -69,3 +69,15 @@ h1 {
 .stock-body .positive {
   color: green;
 }
+
+.company-insights {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.company-insights td, th {
+  text-align: center !important;
+}
+
+.mat-sort-header-container {
+  justify-content: center !important;
+}
