@@ -6,7 +6,7 @@ import {StockPortfolioComponent} from "./components/stock-portfolio/stock-portfo
 export const routes: Routes = [
   {path: 'search', component: StockSearchComponent},
   {path: 'search/:stockTicker', component: StockSearchComponent},
-  {path: 'wishlist', component: StockWishlistComponent},
+  {path: 'watchlist', component: StockWishlistComponent},
   {path: 'portfolio', component: StockPortfolioComponent},
   {path: '', redirectTo: '/search', pathMatch: 'full'}
 ];

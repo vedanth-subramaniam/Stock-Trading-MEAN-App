@@ -28,4 +28,10 @@ export class NewsDetailsDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
     console.log("Dialog data", data)
   }
+
+// In your component class
+  myEncodeURIComponent(text: string): string {
+    return encodeURIComponent(text);
+  }
+
 }

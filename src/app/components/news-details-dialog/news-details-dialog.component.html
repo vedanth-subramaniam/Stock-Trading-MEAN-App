@@ -10,12 +10,22 @@
       <p>For more details click <a href="{{data.url}}" target="_blank">here</a></p>
     </mat-dialog-content>
     <mat-dialog-actions>
-      <span><i class="bi bi-x" href="www.x.com"><a class="twitter-share-button"
-                                                   href="https://twitter.com/intent/tweet">
-Tweet</a></i></span>
-      <span><i class="fa-brands fa-square-facebook" href="www.facebook.com"></i></span>
-      <!--      <a mat-button href="www.x.com" target="_blank">X</a>-->
-      <a mat-button href="www.facebook.com" target="_blank">Facebook</a>
+      <div class="modal-footer news-footer">
+        <div class="icon-section d-flex align-items-center">
+          <span>
+            <a target="_blank" class="share-icon twitter-share-button"
+               [href]="'https://twitter.com/intent/tweet?text=' + myEncodeURIComponent(data.headline) + '&url=' + myEncodeURIComponent(data.url)"
+               data-size="large">
+              <i class="bi bi-twitter-x twitter-icon h1"></i></a>
+          </span>
+          <span class="share-icon fb-share-button" data-href="encodeURLComponent(news.url)" data-layout=""
+                data-size="large">
+            <a target="_blank"
+               href="https://www.facebook.com/sharer/sharer.php?u={{ myEncodeURIComponent(data.url) }}"
+               class="fb-xfbml-parse-ignore"><i class="bi bi-facebook h1"></i></a>
+          </span>
+        </div>
+      </div>
     </mat-dialog-actions>
   </div>
 </div>
