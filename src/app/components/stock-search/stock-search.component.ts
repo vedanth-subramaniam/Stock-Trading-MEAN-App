@@ -207,9 +207,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     });
   }
 
-  changeRoute(searchInput:any){
+  changeRoute(searchInput: any) {
     this.router.navigate(['/search'], {queryParams: {ticker: searchInput}});
   }
+
   searchStock(searchInput: any) {
     this.portfolioBoughtAlertMessageBoolean = false;
     this.autocompleteSearchResults = [];
@@ -243,11 +244,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
             }
             console.log('State changes inside company details', this.stockStateService.getState());
             this.showSpinnerSearch = false;
-
           },
           error => {
             console.error('Error fetching Company Common Details', error);
-          }
+          },
         ))
       ).subscribe({
         next: (response: any) => {
