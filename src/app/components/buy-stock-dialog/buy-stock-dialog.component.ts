@@ -10,7 +10,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {FormsModule} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
-import {CurrencyPipe, NgIf} from "@angular/common";
+import {CurrencyPipe, DecimalPipe, NgIf} from "@angular/common";
 import {StockApiService} from "../../services/stock-api.service";
 import {error} from "@angular/compiler-cli/src/transformers/util";
 
@@ -28,7 +28,8 @@ import {error} from "@angular/compiler-cli/src/transformers/util";
     MatDialogClose,
     MatDialogTitle,
     MatLabel,
-    NgIf
+    NgIf,
+    DecimalPipe
   ],
   templateUrl: './buy-stock-dialog.component.html',
   styleUrl: './buy-stock-dialog.component.css'

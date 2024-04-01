@@ -1,74 +1,52 @@
-.mat-dialog-content {
-  font-size: 1rem;
+
+.container {
+  font-family: 'Arial', sans-serif;
 }
 
-.mat-dialog-actions {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 1rem;
+.close-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
 }
 
-.mat-form-field {
+.current-price, .wallet-balance {
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.quantity-input {
+  font-size: 0.9rem;
+  border: 1px solid #a9a9a9;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 8px;
   width: 100%;
+  box-sizing: border-box;
 }
 
-.buy-btn {
+.total-amount {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.sell-button {
   background-color: green;
   color: white;
-}
-
-.cancel-btn {
-  background-color: grey;
-  color: white;
-}
-
-input.mat-input-element {
-  padding: .375rem .75rem;
-}
-
-.mat-dialog-container {
-  max-width: 300px;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.9rem;
 }
 
 .wallet-warning {
   color: #d32f2f;
+  font-size: 0.8rem;
   margin-top: 1rem;
-}
-
-.mat-dialog-content {
-  font-size: 1rem;
-}
-
-.mat-dialog-actions {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 1rem;
-}
-
-.mat-form-field {
-  width: 100%;
-}
-
-.buy-btn {
-  background-color: green;
-  color: white;
-}
-
-.cancel-btn {
-  background-color: grey;
-  color: white;
-}
-
-input.mat-input-element {
-  padding: .375rem .75rem;
 }
 
 .mat-dialog-container {
-  max-width: 300px;
+  max-width: 100%;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
 }
-
-.wallet-warning {
-  color: #d32f2f;
-  margin-top: 1rem;
-}
-

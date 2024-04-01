@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {CurrencyPipe, NgIf} from "@angular/common";
+import {CurrencyPipe, DecimalPipe, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
 import {
@@ -28,7 +28,8 @@ import {StockApiService} from "../../services/stock-api.service";
     MatFormField,
     MatInput,
     MatLabel,
-    NgIf
+    NgIf,
+    DecimalPipe
   ],
   templateUrl: './sell-stock-dialog.component.html',
   styleUrl: './sell-stock-dialog.component.css'
@@ -47,11 +48,17 @@ export class SellStockDialogComponent implements OnInit {
     this.stockService.getWalletBalanceDB().subscribe({
       next: (response: any) => this.walletBalance = response.balance,
     });
+    console.log("Sell data");
+    console.log(data);
     this.updateTotal(); // Initialize total
   }
 
   updateTotal() {
     this.total = this.data.latestPrice * this.quantity;
+  }
+
+  closeDialog() {
+    this.dialogRef.close();
   }
 
   confirmPurchase() {
@@ -68,7 +75,11 @@ export class SellStockDialogComponent implements OnInit {
       this.stockService.updateWalletBalanceDB(this.walletBalance).subscribe({
         next: () => console.log("Updated wallet price")
       });
-      this.dialogRef.close({data: this.data.stock.ticker + " was sold successfully", show: true, wallet:this.walletBalance});
+      this.dialogRef.close({
+        data: this.data.stock.ticker + " was sold successfully",
+        show: true,
+        wallet: this.walletBalance
+      });
     }
   }
 
