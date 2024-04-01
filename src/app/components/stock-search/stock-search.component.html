@@ -10,7 +10,7 @@
         <input matInput type="text" [formControl]="stockSearchControl"
                class="form-control border-0 no-outline"
                placeholder="Enter stock ticker symbol" aria-label="Stock ticker symbol" [matAutocomplete]="auto"
-               (keydown.enter)="searchStock(stockSearchControl.value)">
+               (keydown.enter)="changeRoute(stockSearchControl.value)">
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
           <ng-container *ngFor="let option of autocompleteSearchResults">
             <mat-option [value]="option.displaySymbol"
@@ -54,7 +54,7 @@
       </ngb-alert>
       <div class="container">
         <div class="row">
-          <div class="col-4 text-center">
+          <div class="col-sm-5 text-center">
             <div class="p-1 fs-5">
               {{ stockProfile?.ticker }}
               <i [ngClass]="{'bi bi-star': !isFavorite, 'bi bi-star-fill text-warning': isFavorite}"
@@ -71,7 +71,7 @@
               </button>
             </div>
           </div>
-          <div class="col-4">
+          <div class="col-sm-2">
             <div class="text-center p-1">
               <img class="stock-company-logo" [src]="stockProfile?.logo">
             </div>
@@ -82,7 +82,7 @@
               <div *ngIf="!getMarketStatus()" class="text-success">Market is Open</div>
             </div>
           </div>
-          <div class="col-4 text-center">
+          <div class="col-sm-5 text-center">
             <div class="p-1 stock-body">
               <div class="p-1 fs-5"
                    [ngClass]="{'negative': !getProfitOrLossCP(), 'positive': getProfitOrLossCP()}">{{ latestPrice?.c }}
@@ -111,20 +111,20 @@
       <ng-container *ngTemplateOutlet="getTemplate()"></ng-container>
     </ng-template>
   </div>
-  <div id="company-summary-section">
+  <div id="company-summary-section container-fluid d-flex">
     <ng-template #summaryTab>
-      <div class="container-md d-md-flex">
-        <div class="row-cols-6">
+      <div class="row">
+        <div class="col-md-6 col-sm-12">
           <div class="w-100">
             <div>
-              <div class="text-center m-2">
-                <div>High Price : {{ latestPrice?.h }}</div>
-                <div>Low Price: {{ latestPrice?.l }}</div>
-                <div>Open Price: {{ latestPrice?.o }}</div>
-                <div>Prev. Close: {{ latestPrice?.pc }}</div>
+              <div class="mx-5 p-md-4 p-sm-1 text-sm-center text-md-start">
+                <div><strong>High Price </strong> : {{ latestPrice?.h }}</div>
+                <div><strong>Low Price  </strong> : {{ latestPrice?.l }}</div>
+                <div><strong>Open Price </strong> : {{ latestPrice?.o }}</div>
+                <div><strong>Prev. Close</strong> : {{ latestPrice?.pc }}</div>
               </div>
             </div>
-            <div>
+            <div class="text-center">
               <div>
                 <p><strong>About the company</strong></p>
               </div>
@@ -135,7 +135,7 @@
                 <p><strong>Company Peers: </strong></p>
                 <div class="company-peers-container">
               <span *ngFor="let company of companyPeers; let isLast=last">
-                    <a href="#"
+                    <a href="#" class="text-decoration-underline"
                        (click)="changeRoute(company); $event.preventDefault()">{{ company }}</a>
               </span>
                 </div>
@@ -143,13 +143,13 @@
             </div>
           </div>
         </div>
-        <div class="row-cols-6 w-100">
-          <div class="w-100 text-center">
-            <!--            <highcharts-chart-->
-            <!--              [Highcharts]="Highcharts"-->
-            <!--              [options]="chartOptionsSummary"-->
-            <!--              style="width: 100%; height: 400px; display: inline;">-->
-            <!--            </highcharts-chart>-->
+        <div class="col-md-6 col-sm-12">
+          <div class="text-center">
+            <highcharts-chart
+              [Highcharts]="Highcharts"
+              [options]="chartOptionsSummary"
+              style="max-width: 100%; max-height: 400px; display: block;">
+            </highcharts-chart>
           </div>
         </div>
       </div>
@@ -222,7 +222,7 @@
             </div>
           </div>
         </div>
-        <div class="container">
+        <div class="container-fluid">
           <div class="row">
             <div class="col-12 col-md-6">
               <highcharts-chart

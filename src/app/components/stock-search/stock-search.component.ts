@@ -260,12 +260,17 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     this.stockService.getChartsHourlyDetailsAPI(this.tickerSymbol).subscribe({
       next: (response) => {
         this.chartsHourlyResponse = response;
-        this.chartsHourlyDataList = this.chartsHourlyResponse.results;
-        console.log("Charts Hourly Data");
-        console.log(this.chartsHourlyDataList);
-        this.getHourlyChartsOptions();
+        this.chartsHourlyDataList = this.chartsHourlyResponse.results.slice(-16);
+        this.stockService.getLatestStockPrice(this.tickerSymbol).subscribe({
+          next: (response: any) => {
+            this.latestPrice = response;
+            console.log("Charts Hourly Data");
+            console.log(this.chartsHourlyDataList);
+            this.getHourlyChartsOptions();
+          }
+        });
       }
-    })
+    });
 
     this.stockService.getNewsTabDetailsAPI(this.tickerSymbol).subscribe({
       next: (response: any) => {
@@ -384,6 +389,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   getProfitOrLossCP() {
+    console.log(this.latestPrice?.d);
+    console.log("Profit or loss");
     return this.latestPrice?.d >= 0;
   }
 
@@ -542,7 +549,9 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   getHourlyChartsOptions() {
 
     let stockPriceData = this.chartsHourlyDataList.map((item: any) => [item.t, item.o]);
-    let chartColour = this.getProfitOrLossCP() ? 'FF0000FF' : '008000FF';
+    let chartColour = this.getProfitOrLossCP() ? 'green' : 'red';
+    console.log(chartColour);
+    console.log("HOurly chart colour");
     this.chartOptionsSummary = {
       chart: {
         type: 'line'
@@ -551,14 +560,17 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         text: this.chartsHourlyResponse.ticker + ' Hourly Price Variation'
       },
       xAxis: {
-        type: 'datetime',
-        dateTimeLabelFormats: { // don't display the dummy year
-          month: '%e. %b',
-          year: '%b'
+        categories: this.chartsHourlyDataList.map((item: any) => {
+          let date = new Date(item["t"]);
+          return date.toLocaleTimeString("en-US", {hour12: false});
+        }),
+        labels: {
+          step: 3,
         },
         title: {
           text: 'Date'
-        }
+        },
+
       },
       yAxis: {
         title: {
@@ -567,14 +579,17 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       },
       series: [{
         name: this.chartsHourlyResponse.ticker + ' Stock Price',
-        data: stockPriceData// data should be filled in here.
+        data: stockPriceData,
+        marker: {
+          enabled: false,
+        },
+        color: chartColour// data should be filled in here.
       }]
     };
   }
 
   getInsightRecommendationsChartOptions() {
     console.log(this.insightsResponse.stockRecommendations);
-
     this.insightsRecommendationChartOptions = {
       chart: {
         type: "column",
