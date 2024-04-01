@@ -75,11 +75,6 @@ export class SellStockDialogComponent implements OnInit {
       this.stockService.updateWalletBalanceDB(this.walletBalance).subscribe({
         next: () => console.log("Updated wallet price")
       });
-      if (this.data.stock.quantity <= 0) {
-        this.stockService.deleteFromPortfolioDB(this.data.stock.ticker).subscribe({
-          next: () => console.log("Removed from DB")
-        });
-      }
       this.dialogRef.close({
         data: this.data.stock.ticker + " was sold successfully",
         show: true,

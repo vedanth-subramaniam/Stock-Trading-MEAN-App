@@ -201,29 +201,31 @@
             <div class="text-center fs-4">
               <div>Insider Sentiments</div>
             </div>
-            <div class="container text-center p-md-5 m-md-5">
-              <table mat-table [dataSource]="aggregateSentimentTable" class="table table-hover"
-                     *ngIf="aggregateSentimentTable">
+            <div class="container d-flex justify-content-center text-center">
+              <div class="w-50">
+                <table mat-table [dataSource]="aggregateSentimentTable" class="table table-hover"
+                       *ngIf="aggregateSentimentTable">
 
-                <ng-container matColumnDef="field">
-                  <th mat-header-cell *matHeaderCellDef>{{ stockProfile?.name }}</th>
-                  <td mat-cell *matCellDef="let element" class="fw-semibold">{{ element.field }}</td>
-                </ng-container>
+                  <ng-container matColumnDef="field">
+                    <th mat-header-cell *matHeaderCellDef>{{ stockProfile?.name }}</th>
+                    <td mat-cell *matCellDef="let element" class="fw-semibold">{{ element.field }}</td>
+                  </ng-container>
 
-                <ng-container matColumnDef="mspr">
-                  <th mat-header-cell *matHeaderCellDef>MSPR</th>
-                  <td mat-cell *matCellDef="let element">{{ element.mspr | number:'1.0-2' }}</td>
-                </ng-container>
+                  <ng-container matColumnDef="mspr">
+                    <th mat-header-cell *matHeaderCellDef>MSPR</th>
+                    <td mat-cell *matCellDef="let element">{{ element.mspr | number:'1.0-2' }}</td>
+                  </ng-container>
 
-                <ng-container matColumnDef="change">
-                  <th mat-header-cell *matHeaderCellDef>Change</th>
-                  <td mat-cell *matCellDef="let element">{{ element.change }}</td>
-                </ng-container>
+                  <ng-container matColumnDef="change">
+                    <th mat-header-cell *matHeaderCellDef>Change</th>
+                    <td mat-cell *matCellDef="let element">{{ element.change }}</td>
+                  </ng-container>
 
-                <tr mat-header-row *matHeaderRowDef="['field', 'mspr', 'change']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['field', 'mspr', 'change']"></tr>
+                  <tr mat-header-row *matHeaderRowDef="['field', 'mspr', 'change']"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['field', 'mspr', 'change']"></tr>
 
-              </table>
+                </table>
+              </div>
             </div>
           </div>
         </div>
