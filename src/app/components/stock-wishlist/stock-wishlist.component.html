@@ -1,10 +1,9 @@
 <div class="container my-4">
-  <h1>My Watchlist</h1>
+  <div class="fs-3 fw-normal my-4">My Watchlist</div>
   <ngb-alert [dismissible]="false" [hidden]="stocks.length > 0" class="text-center">
     Currently you don't have any stock in your watchlist
   </ngb-alert>
-  <div *ngFor="let stock of stocks; let i = index" class="card">
-
+  <div *ngFor="let stock of stocks; let i = index" class="card mb-2">
     <div class="card-body p-0" (click)="navigateToSearch(stock.stockTicker)">
       <button class="text-start btn border-0 close" type="button"
               (click)="deleteStock(stock._id, stock.stockTicker, i)">
