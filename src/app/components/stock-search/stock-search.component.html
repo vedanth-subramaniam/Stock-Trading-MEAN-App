@@ -14,17 +14,17 @@
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
           <ng-container *ngFor="let option of autocompleteSearchResults">
             <mat-option [value]="option.displaySymbol"
-                        (click)="searchStock(stockSearchControl.value)">
+                        (click)="changeRoute(stockSearchControl.value)">
               {{ option.displaySymbol + " | " + option.description }}
             </mat-option>
           </ng-container>
         </mat-autocomplete>
         <div class="input-group-append">
-          <button class="btn no-outline" type="button" (click)="searchStock(stockSearchControl.value)">
-            <i class="bi bi-search"></i>
+          <button class="btn no-outline" type="button" (click)="changeRoute(stockSearchControl.value)">
+            <i class="bi bi-search" style="color: darkblue"></i>
           </button>
           <button class="btn border-0" type="button" (click)="clearSearch()">
-            <i class="bi bi-x-lg"></i>
+            <i class="bi bi-x-lg" style="color: darkblue"></i>
           </button>
         </div>
       </div>
