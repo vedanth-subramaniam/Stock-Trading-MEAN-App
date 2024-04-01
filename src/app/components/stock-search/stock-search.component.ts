@@ -244,6 +244,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
             }
             console.log('State changes inside company details', this.stockStateService.getState());
             this.showSpinnerSearch = false;
+            this.showSpinner = false;
           },
           error => {
             console.error('Error fetching Company Common Details', error);

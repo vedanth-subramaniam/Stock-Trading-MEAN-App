@@ -1,22 +1,25 @@
 <section id="search-section">
-  <div class="container mt-5 d-md-flex flex-column justify-content-center">
-    <div class="d-md-flex justify-content-center mb-2">
-      <h1>STOCK SEARCH</h1>
+  <div class="container mt-5 d-flex flex-column justify-content-center">
+    <div class="row justify-content-center mb-2">
+      <div class="col-12 text-center">
+        <h1>STOCK SEARCH</h1>
+      </div>
     </div>
-    <div class="d-md-flex justify-content-center container-md">
-      <div class="input-group mb-3 search-bar row">
+    <div class="row justify-content-center container-md">
+      <div class="input-group mb-3 search-bar">
         <input matInput type="text" [formControl]="stockSearchControl"
-               class="form-control me-2 border-0 no-outline col-md-10"
+               class="form-control border-0 no-outline"
                placeholder="Enter stock ticker symbol" aria-label="Stock ticker symbol" [matAutocomplete]="auto"
-               (keydown.enter)="searchStock(stockSearchControl.value)"> <!-- Updated this line -->
+               (keydown.enter)="searchStock(stockSearchControl.value)">
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
           <ng-container *ngFor="let option of autocompleteSearchResults">
             <mat-option [value]="option.displaySymbol"
-                        (click)="searchStock(stockSearchControl.value)">{{ option.displaySymbol + " | " + option.description }}
+                        (click)="searchStock(stockSearchControl.value)">
+              {{ option.displaySymbol + " | " + option.description }}
             </mat-option>
           </ng-container>
         </mat-autocomplete>
-        <div class="input-group-append d-flex col-md-2">
+        <div class="input-group-append">
           <button class="btn no-outline" type="button" (click)="searchStock(stockSearchControl.value)">
             <i class="bi bi-search"></i>
           </button>
@@ -26,7 +29,6 @@
         </div>
       </div>
     </div>
-
   </div>
   <div *ngIf="errorMessage" class="container-sm">
     <ngb-alert type='danger' [hidden]="!errorMessage">No data found for the search results</ngb-alert>
