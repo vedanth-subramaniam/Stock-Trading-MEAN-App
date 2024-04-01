@@ -4,7 +4,7 @@ const cors = require('cors');
 const axios = require('axios');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://vedanth1112:Masonmount3900@assignment-3-cluster.b3ibtuy.mongodb.net/?retryWrites=true&w=majority&appName=Assignment-3-Cluster";
-const port = 3000;
+const port = parseInt(process.env.PORT) || 8080;
 app.use(express.json());
 
 const client = new MongoClient(uri, {
@@ -88,7 +88,7 @@ app.get('/latestPrice/:stockTicker', async function (req, res) {
 app.get('/chartsHourly/:stockTicker', async function (req, res) {
 
     const stockTickerSymbol = req.params.stockTicker;
-    console.log("Charts API");
+    console.log("Charts Hourly API");
     try {
         const multiplier = 1;
         const timespan = 'hour';
@@ -318,7 +318,7 @@ app.post('/insertStockWishlist', async function (req, res) {
     const result = await collection.updateOne(filter, update, options);
     console.log(`${result.modifiedCount} document(s) updated`);
 
-    res.send("Stock wishlist updated");
+    res.status(200).send("Stock wishlist updated");
 });
 
 app.get('/getStock/:stockTicker', async function (req, res) {
@@ -331,7 +331,7 @@ app.get('/getStock/:stockTicker', async function (req, res) {
         const stockTickerSymbol = req.params.stockTicker;
         const stockData = await collection.findOne({ stockTicker: stockTickerSymbol });
         if (stockData) {
-            res.send(stockData);
+            res.status(200).json(stockData);
         } else {
             res.status(404).json({ error: 'Stock not found' });
         }
@@ -367,7 +367,7 @@ app.get('/deleteStockFromWishlist/:stockTicker', async function (req, res) {
         const stockTickerSymbol = req.params.stockTicker;
         const result = await collection.deleteOne({ stockTicker: stockTickerSymbol });
         if (result.deletedCount === 1) {
-            res.send("Stock deleted successfully");
+            res.status(200).send("Stock deleted successfully");
         } else {
             res.status(404).json({ error: 'Stock not found' });
         }
@@ -391,12 +391,12 @@ app.post('/insertIntoPortfolio', async (req, res) => {
         const filter = { ticker: stockTickerSymbol };
         const update = { $set: bodyWithoutId }; // Use the body without '_id'
         const options = { upsert: true };
-    
+
         const result = await collection.updateOne(filter, update, options);
-        
+
         console.log(`${result.modifiedCount} document(s) updated`);
 
-        res.send("Stock portfolio updated");
+        res.status(200).send("Stock portfolio updated");
     } catch (error) {
         console.error('Error updating stock portfolio:', error.message);
         res.status(500).json({ error: 'Internal server error' });
@@ -430,7 +430,8 @@ app.get('/getPortfolioData/:stockTicker', async function (req, res) {
         if (portfolioData) {
             res.send(portfolioData);
         } else {
-            res.status(404).json({ error: 'Portfolio data not found' });
+            let object = { ticker: stockTickerSymbol, quantity: 0, averagePrice: 0, totalInvestment: 0 };
+            res.status(404).json({ data: object });
         }
     } catch (error) {
         console.error('Error fetching portfolio data:', error.message);
@@ -448,7 +449,7 @@ app.get('/deleteFromPortfolio/:stockTicker', async function (req, res) {
         const stockTickerSymbol = req.params.stockTicker;
         const result = await collection.deleteOne({ ticker: stockTickerSymbol });
         if (result.deletedCount === 1) {
-            res.send("Stock deleted from portfolio");
+            res.status(200).send("Stock deleted from portfolio");
         } else {
             res.status(404).json({ error: 'Stock not found in portfolio' });
         }
@@ -483,7 +484,7 @@ app.post('/updateWalletBalance', async function (req, res) {
         const collection = database.collection(collectionName);
         const newBalance = req.body.balance;
         await collection.updateOne({}, { $set: { balance: newBalance } });
-        res.send("Wallet balance updated");
+        res.status(200).send("Wallet balance updated");
     } catch (error) {
         console.error('Error updating wallet balance:', error.message);
         res.status(500).json({ error: 'Internal server error' });
