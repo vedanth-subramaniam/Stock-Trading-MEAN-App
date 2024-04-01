@@ -4,7 +4,6 @@
 
   &.active {
     color: #eee4e4;
-    /*background-color: rgba(245, 245, 245, 0.25);*/
     border: 1px solid #eae1e1;
   }
 

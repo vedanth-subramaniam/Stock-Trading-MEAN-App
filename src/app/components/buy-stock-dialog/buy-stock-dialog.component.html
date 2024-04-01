@@ -1,15 +1,24 @@
 <!-- buy-stock-dialog.component.html -->
-<h2 mat-dialog-title>{{ data.stock.ticker }}</h2>
-<mat-dialog-content class="mat-typography">
-  <p>Current Price: {{ data.latestPrice | currency }}</p>
-  <p>Money in Wallet: {{ walletBalance | currency }}</p>
-  <mat-form-field>
-    <mat-label>Quantity</mat-label>
-    <input matInput type="number" min="1" [(ngModel)]="quantity" (ngModelChange)="updateTotal()">
-  </mat-form-field>
-  <p *ngIf="total > walletBalance" class="wallet-warning">Not enough money in wallet!</p>
-  <p>Total: {{ total | currency }}</p>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button [disabled]="total > walletBalance" (click)="confirmPurchase()" class="btn-primary">Buy</button>
-</mat-dialog-actions>
+<div>
+  <div class="container m-2">
+    <div class="fs-5 fw-medium">{{ data.stock.ticker }}</div>
+  </div>
+  <mat-dialog-content class="border-top fw-6">
+    <p>Current Price: {{ data.latestPrice }}</p>
+    <p>Money in Wallet: {{ walletBalance | currency }}</p>
+    <mat-form-field>
+      <mat-label>Quantity</mat-label>
+      <input matInput type="number" min="1" [(ngModel)]="quantity" (ngModelChange)="updateTotal()">
+      <p *ngIf="total > walletBalance" class="wallet-warning">Not enough money in wallet!</p>
+    </mat-form-field>
+  </mat-dialog-content>
+  <div class="container m-2 border-top p-2">
+    <div class="row">
+      <div class="col-8">Total: {{ total | currency }}</div>
+      <div class="col-4">
+        <button class="btn btn-primary" [disabled]="total > walletBalance" (click)="confirmPurchase()">Buy
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

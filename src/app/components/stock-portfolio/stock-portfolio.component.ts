@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {StockApiService} from "../../services/stock-api.service";
-import {CurrencyPipe, NgForOf} from "@angular/common";
+import {CurrencyPipe, DecimalPipe, NgForOf} from "@angular/common";
 import {BuyStockDialogComponent} from "../buy-stock-dialog/buy-stock-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {SellStockDialogComponent} from "../sell-stock-dialog/sell-stock-dialog.component";
@@ -12,7 +12,8 @@ import {NgbAlert} from "@ng-bootstrap/ng-bootstrap";
   imports: [
     CurrencyPipe,
     NgForOf,
-    NgbAlert
+    NgbAlert,
+    DecimalPipe
   ],
   templateUrl: './stock-portfolio.component.html',
   styleUrl: './stock-portfolio.component.css'
