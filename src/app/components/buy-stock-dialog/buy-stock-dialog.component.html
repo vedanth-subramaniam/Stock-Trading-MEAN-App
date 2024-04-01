@@ -1,24 +1,30 @@
-<!-- buy-stock-dialog.component.html -->
-<div>
-  <div class="container m-2">
-    <div class="fs-5 fw-medium">{{ data.stock.ticker }}</div>
+<!-- Adjustments might be needed for the close button and alignment -->
+<div class="container m-2 py-2">
+  <div class="fs-4 fw-medium d-flex justify-content-between">
+    <span>{{ data.stock.ticker }}</span>
+    <button class="close-btn" (click)="closeDialog()">×</button>
   </div>
-  <mat-dialog-content class="border-top fw-6">
-    <p>Current Price: {{ data.latestPrice }}</p>
-    <p>Money in Wallet: {{ walletBalance | currency }}</p>
+</div>
+
+<div class="border-top fw-normal p-3">
+  <p class="current-price">Current Price: {{ data.latestPrice }}</p>
+  <p class="wallet-balance">Money in Wallet: {{ walletBalance | currency }}</p>
+  <div class="d-flex align-items-center">
+    <p class="mx-1">Quantity: </p>
     <mat-form-field>
-      <mat-label>Quantity</mat-label>
-      <input matInput type="number" min="1" [(ngModel)]="quantity" (ngModelChange)="updateTotal()">
+      <input type="number" min="1" [(ngModel)]="quantity" (ngModelChange)="updateTotal()"
+             class="quantity-input w-100">
       <p *ngIf="total > walletBalance" class="wallet-warning">Not enough money in wallet!</p>
     </mat-form-field>
-  </mat-dialog-content>
-  <div class="container m-2 border-top p-2">
-    <div class="row">
-      <div class="col-8">Total: {{ total | currency }}</div>
-      <div class="col-4">
-        <button class="btn btn-primary" [disabled]="total > walletBalance" (click)="confirmPurchase()">Buy
-        </button>
-      </div>
+  </div>
+</div>
+
+<div class="container border-top pt-2">
+  <div class="row">
+    <div class="col-8 total-amount d-flex align-items-center">Total: {{ total }}</div>
+    <div class="col-4 text-sm-center">
+      <button class="btn buy-btn" [disabled]="total > walletBalance" (click)="confirmPurchase()">Buy
+      </button>
     </div>
   </div>
 </div>

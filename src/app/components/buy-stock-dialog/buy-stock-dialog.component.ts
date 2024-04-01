@@ -72,6 +72,11 @@ export class BuyStockDialogComponent implements OnInit {
       })
       this.dialogRef.close({data:  this.data.stock.ticker + " was bought successfully", show: true, wallet:this.walletBalance});
     }
+
+  }
+
+  closeDialog(){
+    this.dialogRef.close();
   }
 
   ngOnInit(): void {
