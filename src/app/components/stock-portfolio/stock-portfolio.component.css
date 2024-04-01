@@ -10,3 +10,7 @@
 .button-actions {
   background-color: #ecebeb;
 }
+
+.table td, .table th {
+  border-bottom: none; /* Removes the top border from table cells if present */
+}
