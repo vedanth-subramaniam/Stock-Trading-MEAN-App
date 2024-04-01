@@ -179,6 +179,8 @@ export class StockSearchComponent implements OnInit, OnDestroy {
         this.isFavorite = false;
       }
     });
+    this.fetchPortfolioAndWallet();
+
     this.autocompleteSearchResults = [];
     this.stockSearchControl.valueChanges.pipe(
       debounceTime(700), // Wait for 700ms pause in events
@@ -235,7 +237,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
             this.latestPrice = this.companyInfoResponse.latestPrice;
             this.companyPeers = this.companyInfoResponse.companyPeers;
             this.currentTab = "Summary";
-            fetchPortfolioAndWallet();
+            this.fetchPortfolioAndWallet();
             this.onStateChange();
             if (this.companyInfoResponse.companyPeers.length == 0) {
               console.log("Empty");
@@ -317,49 +319,48 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       }
     });
 
-    const fetchPortfolioAndWallet = () => {
-      this.stockService.getSingleRecordPortfolioDB(this.tickerSymbol).subscribe({
-        next: (response: any) => {
-          this.stockPortfolioData = response;
-          console.log("Stock Portfolio Data", this.stockPortfolioData);
-          this.onStateChange();
-        },
-        error: (error: any) => {
-          console.log("Error in fetching stock portfolio data for company", error);
-          this.stockPortfolioData = {
-            ticker: this.tickerSymbol,
-            companyName: this.stockProfile?.name,
-            quantity: 0,
-            avgCostPerShare: 0,
-            totalCost: 0,
-            change: 0,
-            currentPrice: 0,
-            marketValue: 0
-          };
-        }
-      });
-
-      this.stockService.getTickerWishListDB(this.tickerSymbol).subscribe({
-        next: (response: any) => {
-          console.log("Stock has been fetched from wishlist");
-          this.isFavorite = true;
-        },
-        error: (error: any) => {
-          this.isFavorite = false;
-        }
-      });
-      this.stockService.getWalletBalanceDB().subscribe({
-        next: (response: any) => {
-          console.log("Wallet fetched from DB");
-          this.walletBalance = response.balance;
-        }
-      });
-    }
-
     this.onStateChange();
     console.log('State changes', this.stockStateService.getState());
   }
 
+  fetchPortfolioAndWallet = () => {
+    this.stockService.getSingleRecordPortfolioDB(this.tickerSymbol).subscribe({
+      next: (response: any) => {
+        this.stockPortfolioData = response;
+        console.log("Stock Portfolio Data", this.stockPortfolioData);
+        this.onStateChange();
+      },
+      error: (error: any) => {
+        console.log("Error in fetching stock portfolio data for company", error);
+        this.stockPortfolioData = {
+          ticker: this.tickerSymbol,
+          companyName: this.stockProfile?.name,
+          quantity: 0,
+          avgCostPerShare: 0,
+          totalCost: 0,
+          change: 0,
+          currentPrice: 0,
+          marketValue: 0
+        };
+      }
+    });
+
+    this.stockService.getTickerWishListDB(this.tickerSymbol).subscribe({
+      next: (response: any) => {
+        console.log("Stock has been fetched from wishlist");
+        this.isFavorite = true;
+      },
+      error: (error: any) => {
+        this.isFavorite = false;
+      }
+    });
+    this.stockService.getWalletBalanceDB().subscribe({
+      next: (response: any) => {
+        console.log("Wallet fetched from DB");
+        this.walletBalance = response.balance;
+      }
+    });
+  }
   selectTab(index: number) {
     this.selectedIndex = index;
   }
@@ -389,8 +390,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   getProfitOrLossCP() {
-    console.log(this.latestPrice?.d);
-    console.log("Profit or loss");
     return this.latestPrice?.d >= 0;
   }
 
@@ -417,7 +416,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
-      this.portfolioBoughtAlertMessage = false;
+      this.portfolioBoughtAlertMessageBoolean = false;
       if (result.show) {
         this.portfolioBoughtAlertMessage = result.data;
         this.portfolioBoughtAlertMessageBoolean = true;
@@ -430,11 +429,12 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(SellStockDialogComponent, {
       width: '400px',
       position: {top: '2%'},
-      data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance, latestPrice: this.latestPrice}
+      data: {stock: this.stockPortfolioData, walletBalance: this.walletBalance, latestPrice: this.latestPrice.c}
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      this.portfolioAlertSoldMessageBoolean = false;
       if (result.show) {
         this.portfolioAlertSoldMessage = result.data;
         this.portfolioAlertSoldMessageBoolean = true;

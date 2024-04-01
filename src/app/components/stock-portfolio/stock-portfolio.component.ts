@@ -75,9 +75,6 @@ export class StockPortfolioComponent implements OnInit {
       console.log('The dialog was closed', result);
       this.walletBalance = result.wallet;
       if (stock.quantity <= 0) {
-        this.stockService.deleteFromPortfolioDB(stock.ticker).subscribe({
-          next: () => console.log("Removed from DB")
-        });
         this.portFolioDataList.splice(index, 1);
       }
     });
