@@ -1,11 +1,15 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 const cors = require('cors');
 const axios = require('axios');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://vedanth1112:Masonmount3900@assignment-3-cluster.b3ibtuy.mongodb.net/?retryWrites=true&w=majority&appName=Assignment-3-Cluster";
 const port = parseInt(process.env.PORT) || 8080;
 app.use(express.json());
+app.use(cors());
+require('dotenv').config();
+const API_KEY = process.env.API_KEY;
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -15,9 +19,12 @@ const client = new MongoClient(uri, {
     }
 });
 
-app.use(cors());
-require('dotenv').config();
-const API_KEY = process.env.API_KEY;
+// app.use(express.static(path.join(__dirname, 'dist/csci-571-assignment-3-angular/browser')));
+
+// app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'dist/csci-571-assignment-3-angular/browser/index.html'));
+//   });
+
 app.get('/search/:stockTicker', async function (req, res) {
 
     console.log("Search API");
@@ -93,9 +100,8 @@ app.get('/chartsHourly/:stockTicker', async function (req, res) {
         const multiplier = 1;
         const timespan = 'hour';
 
-
         const to_date = new Date(new Date() - 24 * 60 * 60 * 1000); // 1 day ago
-        const from_date = new Date(to_date - 48 * 60 * 60 * 1000); // 24 hours ago
+        const from_date = new Date(to_date - 7 * 24 * 60 * 60 * 1000); // 24 hours ago
 
         console.log("To date is:", to_date);
         console.log("From date is:", from_date);
@@ -393,6 +399,7 @@ app.post('/insertIntoPortfolio', async (req, res) => {
         const options = { upsert: true };
 
         const result = await collection.updateOne(filter, update, options);
+        const delResult = await collection.deleteMany({ quantity: { $lte: 0 } });
 
         console.log(`${result.modifiedCount} document(s) updated`);
 
