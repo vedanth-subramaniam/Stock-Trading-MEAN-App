@@ -44,14 +44,22 @@
   </div>
   <div id="common-company-info-section">
     <ng-template #companyInfo>
-      <ngb-alert type='success' [hidden]="!portfolioBoughtAlertMessageBoolean">{{ portfolioBoughtAlertMessage }}
+      <ngb-alert type='success' *ngIf="portfolioAlertBoughtMessageBoolean" (closed)="portfolioAlertBoughtMessageBoolean = false">
+        {{ tickerSymbol }} bought successfully
       </ngb-alert>
-      <ngb-alert type='danger' [hidden]="!portfolioAlertSoldMessageBoolean">{{ tickerSymbol }} sold successfully
+
+      <ngb-alert type='danger' *ngIf="portfolioAlertSoldMessageBoolean" (closed)="portfolioAlertSoldMessageBoolean = false">
+        {{ tickerSymbol }} sold successfully
       </ngb-alert>
-      <ngb-alert type='success' [hidden]="!wishlistAlertMessageAddedBoolean">{{ tickerSymbol }} added to wishlist
+
+      <ngb-alert type='success' *ngIf="wishlistAlertMessageAddedBoolean" (closed)="wishlistAlertMessageAddedBoolean = false">
+        {{ tickerSymbol }} added to wishlist
       </ngb-alert>
-      <ngb-alert type='danger' [hidden]="!wishlistAlertMessageRemovedBoolean">{{ tickerSymbol }} removed from wishlist
+
+      <ngb-alert type='danger' *ngIf="wishlistAlertMessageRemovedBoolean" (closed)="wishlistAlertMessageRemovedBoolean = false">
+        {{ tickerSymbol }} removed from wishlist
       </ngb-alert>
+
       <div class="container">
         <div class="row">
           <div class="col-4 text-center">
@@ -141,7 +149,7 @@
                 <div class="company-peers-container">
               <span *ngFor="let company of companyPeers; let isLast=last">
                     <a href="#" class="text-decoration-underline"
-                       (click)="changeRoute(company); $event.preventDefault()">{{ company }}</a>
+                       (click)="searchStock(company); $event.preventDefault()">{{ company }}</a>
               </span>
                 </div>
               </div>

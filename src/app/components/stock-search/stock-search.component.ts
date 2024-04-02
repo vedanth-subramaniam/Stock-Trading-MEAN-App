@@ -115,11 +115,11 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   aggregatedSentimentData: any;
   aggregateSentimentTable: any;
 
-  portfolioBoughtAlertMessage: any;
+  portfolioAlertBoughtMessage: any;
   portfolioAlertSoldMessage: any;
   wishlistAlertMessageAdded: any;
   wishlistAlertMessageRemoved: any;
-  portfolioBoughtAlertMessageBoolean: boolean = false;
+  portfolioAlertBoughtMessageBoolean: boolean = false;
   portfolioAlertSoldMessageBoolean: boolean = false;
   wishlistAlertMessageAddedBoolean: boolean = false;
   wishlistAlertMessageRemovedBoolean: boolean = false;
@@ -137,13 +137,6 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
-    this.activatedRoute.queryParams.subscribe(params => {
-      const companyName = params['ticker'];
-      if (companyName) {
-        this.searchStock(companyName);
-      }
-    });
 
     console.log("Search component Init");
     const state = this.stockStateService.getState();
@@ -170,6 +163,13 @@ export class StockSearchComponent implements OnInit, OnDestroy {
       this.aggregatedSentimentData = state.aggregatedSentimentData;
       this.stockSearchControl.setValue(state.searchInputValue);
     }
+    this.activatedRoute.queryParams.subscribe(params => {
+     let companyName = params['ticker'];
+      if (companyName) {
+        this.searchStock(companyName);
+      }
+    });
+
     this.stockService.getTickerWishListDB(this.tickerSymbol).subscribe({
       next: (response: any) => {
         console.log("Stock has been fetched from wishlist");
@@ -214,7 +214,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   searchStock(searchInput: any) {
-    this.portfolioBoughtAlertMessageBoolean = false;
+    this.portfolioAlertBoughtMessageBoolean = false;
     this.autocompleteSearchResults = [];
     this.showSpinner = false;
     this.stockSearchControl.setValue(searchInput);
@@ -407,7 +407,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
   buyStock(stock: any) {
     console.log("Buying stock:", stock);
-    this.portfolioBoughtAlertMessageBoolean = false;
+    this.portfolioAlertBoughtMessageBoolean = false;
     const dialogRef = this.dialog.open(BuyStockDialogComponent, {
       width: '400px',
       position: {top: '2%'},
@@ -416,10 +416,10 @@ export class StockSearchComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
-      this.portfolioBoughtAlertMessageBoolean = false;
+      this.portfolioAlertBoughtMessageBoolean = false;
       if (result.show) {
-        this.portfolioBoughtAlertMessage = result.data;
-        this.portfolioBoughtAlertMessageBoolean = true;
+        this.portfolioAlertBoughtMessage= result.data;
+        this.portfolioAlertBoughtMessageBoolean = true;
       }
     });
   }
