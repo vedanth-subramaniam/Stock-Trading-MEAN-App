@@ -30,8 +30,11 @@
       </div>
     </div>
   </div>
-  <div *ngIf="errorMessage" class="container-sm">
-    <ngb-alert type='danger' [hidden]="!errorMessage">No data found for the search results</ngb-alert>
+  <div *ngIf="errorMessage" class="container-sm text-center">
+    <ngb-alert type='danger' (closed)="errorMessage = false">No data found for the search results</ngb-alert>
+  </div>
+  <div *ngIf="emptySearchMessage" class="container-sm text-center">
+    <ngb-alert type='danger' (closed)="emptySearchMessage = false">Please enter a valid ticker</ngb-alert>
   </div>
   <div class="container" *ngIf="showSpinner || showSpinnerSearch">
     <div class="text-center">

@@ -104,6 +104,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   volumeCharts: any = [];
   maxVolumeData = Number.MIN_VALUE;
   errorMessage: boolean = false;
+  emptySearchMessage:boolean = false;
   chartOptionsSummary: any;
   insightsRecommendationChartOptions: any;
   insightsSurpriseChartOptions: any;
@@ -214,6 +215,12 @@ export class StockSearchComponent implements OnInit, OnDestroy {
   }
 
   searchStock(searchInput: any) {
+    if(!searchInput){
+      console.log("Empty");
+      this.emptySearchMessage = true;
+      return;
+    }
+    this.emptySearchMessage = false
     this.portfolioAlertBoughtMessageBoolean = false;
     this.autocompleteSearchResults = [];
     this.showSpinner = false;
@@ -713,6 +720,7 @@ export class StockSearchComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
     this.currentTab = "";
     this.errorMessage = false;
+    this.emptySearchMessage = false;
     this.showSpinner = false;
     this.showSpinnerSearch = false;
     console.log(this.showSpinnerSearch);
