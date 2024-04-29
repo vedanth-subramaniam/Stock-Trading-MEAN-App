@@ -19,12 +19,6 @@ const client = new MongoClient(uri, {
     }
 });
 
-// app.use(express.static(path.join(__dirname, 'dist/csci-571-assignment-3-angular/browser')));
-
-// app.get('*', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'dist/csci-571-assignment-3-angular/browser/index.html'));
-//   });
-
 app.get('/search/:stockTicker', async function (req, res) {
 
     console.log("Search API");
@@ -112,13 +106,16 @@ app.get('/chartsHourly/:stockTicker', async function (req, res) {
         const api_url = `https://api.polygon.io/v2/aggs/ticker/${stockTickerSymbol}/range/${multiplier}/${timespan}/${from_date_str}/${to_date_str}?adjusted=true&sort=asc&apiKey=mwjPq5ceMqn18edHgYpUrK5ZgBul4p2v`;
         console.log(api_url);
         const response = await axios.get(api_url);
-        const chartsHourlyResponse = convertTimestampToPST(response.data);
+        // const chartsHourlyResponse = convertTimestampToPST(response.data);
+        const chartsHourlyResponse = response.data;
+
+        // console.log("Charts hourly response is:", chartsHourlyResponse);
 
         if (!chartsHourlyResponse) {
             return res.status(400).json({ error: 'Chart details not found. Please check stock ticker symbol again.' });
         }
 
-        res.send(chartsHourlyResponse);
+        res.send(chartsHourlyResponse.results);
 
     } catch (error) {
         res.status(500).json({ error: 'Something went wrong' });
@@ -147,12 +144,13 @@ app.get('/charts/:stockTicker', async function (req, res) {
         const response = await axios.get(api_url);
 
         const chartDetails = response.data;
+        // console.log("Chart details are:", chartDetails);
 
         if (!chartDetails) {
             return res.status(400).json({ error: 'Chart details not found. Please check stock ticker symbol again.' });
         }
 
-        res.send(chartDetails);
+        res.send(chartDetails.results);
 
     } catch (error) {
         res.status(500).json({ error: 'Something went wrong' });
@@ -208,7 +206,7 @@ app.get('/insights/:stockTicker', async function (req, res) {
             }
         });
 
-        console.log(recommendationResponse);
+        // console.log(recommendationResponse);
 
         const now = new Date(new Date() - 24 * 60 * 60 * 1000);
         const to_date_str = now.toISOString().split('T')[0];
@@ -219,11 +217,11 @@ app.get('/insights/:stockTicker', async function (req, res) {
                 token: API_KEY,
                 symbol: stockTicker,
                 from: from_date_str,
-                to: to_date_str
+                to: to_date_str311
             }
         });
 
-        console.log(insiderSentimentResponse);
+        // console.log(insiderSentimentResponse);
 
         const earningsResponse = await axios.get('https://finnhub.io/api/v1/stock/earnings', {
             params: {
@@ -232,7 +230,7 @@ app.get('/insights/:stockTicker', async function (req, res) {
             }
         });
 
-        console.log(earningsResponse);
+        // console.log(earningsResponse);
 
         let combinedInsightsResponse = {
             stockRecommendations: recommendationResponse.data,
@@ -246,7 +244,7 @@ app.get('/insights/:stockTicker', async function (req, res) {
 
         console.error('Error fetching company insights:', error.message);
         return res.status(500).json({ error: 'Internal server error' });
-
+        ``
     }
 });
 
@@ -262,7 +260,7 @@ app.get('/autoComplete/:query', async function (req, res) {
         }
     });
 
-    res.send(autoCompleteResponse.data);
+    res.send(autoCompleteResponse.data.result);
 });
 
 
@@ -327,7 +325,7 @@ app.post('/insertStockWishlist', async function (req, res) {
     res.status(200).send("Stock wishlist updated");
 });
 
-app.get('/getStock/:stockTicker', async function (req, res) {
+app.get('/getStockWishlist/:stockTicker', async function (req, res) {
     try {
         await client.connect();
         const dbName = "StockAssignment";
@@ -335,9 +333,30 @@ app.get('/getStock/:stockTicker', async function (req, res) {
         const database = client.db(dbName);
         const collection = database.collection(collectionName);
         const stockTickerSymbol = req.params.stockTicker;
-        const stockData = await collection.findOne({ stockTicker: stockTickerSymbol });
+        const stockData = await collection.findOne({ ticker: stockTickerSymbol });
         if (stockData) {
-            res.status(200).json(stockData);
+            const stockTickerSymbol = stockData.ticker;
+
+            const latestPriceResponse = await axios.get('https://finnhub.io/api/v1/quote', {
+                params: {
+                    token: API_KEY,
+                    symbol: stockTickerSymbol
+                }
+            });
+
+            console.log("Latest price response for: " + stockTickerSymbol, latestPriceResponse.data);
+            const priceData = await latestPriceResponse.data;
+
+            const wishlistDataResponse = {
+                ticker: stockTickerSymbol,
+                companyName: stockData.companyName,
+                price: priceData.c,
+                changePrice: priceData.d,
+                changePricePercent: (priceData.dp).toFixed(2) + '%',
+                isPositive: priceData.dp > 0
+            };
+
+            res.send(wishlistDataResponse);
         } else {
             res.status(404).json({ error: 'Stock not found' });
         }
@@ -347,15 +366,40 @@ app.get('/getStock/:stockTicker', async function (req, res) {
     }
 });
 
-app.get('/getAllStocks', async function (req, res) {
+app.get('/getAllStocksWishlist', async function (req, res) {
     try {
         await client.connect();
         const dbName = "StockAssignment";
         const collectionName = "StockWishlist";
         const database = client.db(dbName);
         const collection = database.collection(collectionName);
-        const stocks = await collection.find().toArray();
-        res.send(stocks);
+        const wishlistStockData = await collection.find().toArray();
+
+        const wishlistDataResponse = await Promise.all(wishlistStockData.map(async (stock) => {
+            const stockTickerSymbol = stock.ticker;
+
+            const latestPriceResponse = await axios.get('https://finnhub.io/api/v1/quote', {
+                params: {
+                    token: API_KEY,
+                    symbol: stockTickerSymbol
+                }
+            });
+
+            console.log("Latest price response for:" + stockTickerSymbol, latestPriceResponse.data);
+            const priceData = await latestPriceResponse.data;
+
+            return {
+
+                ticker: stockTickerSymbol,
+                companyName: stock.companyName,
+                price: priceData.c,
+                changePrice: priceData.d,
+                changePricePercent: (priceData.dp).toFixed(2) + '%',
+                isPositive: priceData.dp > 0
+            };
+        }));
+
+        res.send(wishlistDataResponse);
     } catch (error) {
         console.error('Error fetching stock data:', error.message);
         res.status(500).json({ error: 'Internal server error' });
@@ -418,7 +462,32 @@ app.get('/getAllPortfolioData', async function (req, res) {
         const database = client.db(dbName);
         const collection = database.collection(collectionName);
         const portfolioData = await collection.find().toArray();
-        res.send(portfolioData);
+        const portoflioDataResponse = await Promise.all(portfolioData.map(async (stock) => {
+            const stockTickerSymbol = stock.ticker;
+
+            const latestPriceResponse = await axios.get('https://finnhub.io/api/v1/quote', {
+                params: {
+                    token: API_KEY,
+                    symbol: stockTickerSymbol
+                }
+            });
+
+            console.log("Latest price response for:" + stockTickerSymbol, latestPriceResponse.data);
+            const priceData = await latestPriceResponse.data;
+
+            return {
+                ticker: stockTickerSymbol,
+                shares: stock.quantity,
+                totalCost: stock.totalCost,
+                averagePrice: (stock.totalCost / stock.quantity).toFixed(2),
+                price: priceData.c,
+                marketValue: (priceData.c * stock.quantity).toFixed(2),
+                changePrice: (priceData.c - (stock.totalCost / stock.quantity)).toFixed(2),
+                changePricePercent: ((priceData.c - (stock.totalCost / stock.quantity)) / (stock.totalCost / stock.quantity) * 100).toFixed(2) + '%',
+                isPositive: priceData.c > (stock.totalCost / stock.quantity)
+            };
+        }));
+        res.send(portoflioDataResponse);
     } catch (error) {
         console.error('Error fetching portfolio data:', error.message);
         res.status(500).json({ error: 'Internal server error' });
@@ -434,8 +503,35 @@ app.get('/getPortfolioData/:stockTicker', async function (req, res) {
         const collection = database.collection(collectionName);
         const stockTickerSymbol = req.params.stockTicker;
         const portfolioData = await collection.findOne({ ticker: stockTickerSymbol });
+
+        console.log("Portfolio data is:", portfolioData);
         if (portfolioData) {
-            res.send(portfolioData);
+            const stockTickerSymbol = portfolioData.ticker;
+
+            const latestPriceResponse = await axios.get('https://finnhub.io/api/v1/quote', {
+                params: {
+                    token: API_KEY,
+                    symbol: stockTickerSymbol
+                }
+            });
+
+            console.log("Latest price response for: " + stockTickerSymbol, latestPriceResponse.data);
+            const priceData = await latestPriceResponse.data;
+
+            const portfolioDataResponse = {
+                ticker: stockTickerSymbol,
+                shares: portfolioData.quantity,
+                totalCost: portfolioData.totalCost,
+                averagePrice: (portfolioData.totalCost / portfolioData.quantity).toFixed(2),
+                price: priceData.c,
+                marketValue: (priceData.c * portfolioData.quantity).toFixed(2),
+                changePrice: (priceData.c - (portfolioData.totalCost / portfolioData.quantity)).toFixed(2),
+                changePricePercent: ((priceData.c - (portfolioData.totalCost / portfolioData.quantity)) / (portfolioData.totalCost / portfolioData.quantity) * 100).toFixed(2) + '%',
+                isPositive: priceData.c > (portfolioData.totalCost / portfolioData.quantity)
+            };
+
+            res.send(portfolioDataResponse);
+
         } else {
             let object = { ticker: stockTickerSymbol, quantity: 0, averagePrice: 0, totalInvestment: 0 };
             res.status(404).json({ data: object });
