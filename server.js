@@ -217,7 +217,7 @@ app.get('/insights/:stockTicker', async function (req, res) {
                 token: API_KEY,
                 symbol: stockTicker,
                 from: from_date_str,
-                to: to_date_str311
+                to: to_date_str
             }
         });
 
@@ -315,14 +315,14 @@ app.post('/insertStockWishlist', async function (req, res) {
 
     console.log("Stock data is:", stockData);
 
-    const filter = { stockTicker: stockData.stockTicker };
+    const filter = { ticker: stockData.stockTicker };
     const update = { $set: stockData };
     const options = { upsert: true };
 
     const result = await collection.updateOne(filter, update, options);
     console.log(`${result.modifiedCount} document(s) updated`);
 
-    res.status(200).send("Stock wishlist updated");
+    res.status(200).send({ message: 'Stock wishlist updated'});
 });
 
 app.get('/getStockWishlist/:stockTicker', async function (req, res) {
@@ -350,8 +350,8 @@ app.get('/getStockWishlist/:stockTicker', async function (req, res) {
             const wishlistDataResponse = {
                 ticker: stockTickerSymbol,
                 companyName: stockData.companyName,
-                price: priceData.c,
-                changePrice: priceData.d,
+                price: parseFloat((priceData.c).toFixed(2)),
+                changePrice: parseFloat((priceData.dp).toFixed(2)),
                 changePricePercent: (priceData.dp).toFixed(2) + '%',
                 isPositive: priceData.dp > 0
             };
@@ -415,9 +415,9 @@ app.get('/deleteStockFromWishlist/:stockTicker', async function (req, res) {
         const database = client.db(dbName);
         const collection = database.collection(collectionName);
         const stockTickerSymbol = req.params.stockTicker;
-        const result = await collection.deleteOne({ stockTicker: stockTickerSymbol });
+        const result = await collection.deleteOne({ ticker: stockTickerSymbol });
         if (result.deletedCount === 1) {
-            res.status(200).send("Stock deleted successfully");
+            res.status(200).send({ message: 'Stock deleted from wishlist' });
         } else {
             res.status(404).json({ error: 'Stock not found' });
         }
@@ -447,7 +447,7 @@ app.post('/insertIntoPortfolio', async (req, res) => {
 
         console.log(`${result.modifiedCount} document(s) updated`);
 
-        res.status(200).send("Stock portfolio updated");
+        res.status(200).send({ message: 'Stock portfolio updated'});
     } catch (error) {
         console.error('Error updating stock portfolio:', error.message);
         res.status(500).json({ error: 'Internal server error' });
@@ -477,12 +477,12 @@ app.get('/getAllPortfolioData', async function (req, res) {
 
             return {
                 ticker: stockTickerSymbol,
-                shares: stock.quantity,
-                totalCost: stock.totalCost,
-                averagePrice: (stock.totalCost / stock.quantity).toFixed(2),
+                quantity: stock.quantity,
+                totalCost: parseFloat(stock.totalCost),
+                averagePrice: parseFloat((stock.totalCost / stock.quantity).toFixed(2)),
                 price: priceData.c,
-                marketValue: (priceData.c * stock.quantity).toFixed(2),
-                changePrice: (priceData.c - (stock.totalCost / stock.quantity)).toFixed(2),
+                marketValue: parseFloat((priceData.c * stock.quantity).toFixed(2)),
+                changePrice: parseFloat((priceData.c - (stock.totalCost / stock.quantity)).toFixed(2)),
                 changePricePercent: ((priceData.c - (stock.totalCost / stock.quantity)) / (stock.totalCost / stock.quantity) * 100).toFixed(2) + '%',
                 isPositive: priceData.c > (stock.totalCost / stock.quantity)
             };
@@ -520,12 +520,12 @@ app.get('/getPortfolioData/:stockTicker', async function (req, res) {
 
             const portfolioDataResponse = {
                 ticker: stockTickerSymbol,
-                shares: portfolioData.quantity,
-                totalCost: portfolioData.totalCost,
-                averagePrice: (portfolioData.totalCost / portfolioData.quantity).toFixed(2),
+                quantity: portfolioData.quantity,
+                totalCost: parseFloat(portfolioData.totalCost),
+                averagePrice: parseFloat((portfolioData.totalCost / portfolioData.quantity).toFixed(2)),
                 price: priceData.c,
-                marketValue: (priceData.c * portfolioData.quantity).toFixed(2),
-                changePrice: (priceData.c - (portfolioData.totalCost / portfolioData.quantity)).toFixed(2),
+                marketValue: parseFloat((priceData.c * portfolioData.quantity).toFixed(2)),
+                changePrice: parseFloat((priceData.c - (portfolioData.totalCost / portfolioData.quantity)).toFixed(2)),
                 changePricePercent: ((priceData.c - (portfolioData.totalCost / portfolioData.quantity)) / (portfolioData.totalCost / portfolioData.quantity) * 100).toFixed(2) + '%',
                 isPositive: priceData.c > (portfolioData.totalCost / portfolioData.quantity)
             };
@@ -571,7 +571,8 @@ app.get('/wallet', async function (req, res) {
         const database = client.db(dbName);
         const collection = database.collection(collectionName);
         const walletData = await collection.findOne();
-        res.send(walletData);
+        console.log("Wallet data is:", walletData);
+        res.send({ balance: walletData.balance });
     } catch (error) {
         console.error('Error fetching wallet data:', error.message);
         res.status(500).json({ error: 'Internal server error' });
@@ -587,7 +588,7 @@ app.post('/updateWalletBalance', async function (req, res) {
         const collection = database.collection(collectionName);
         const newBalance = req.body.balance;
         await collection.updateOne({}, { $set: { balance: newBalance } });
-        res.status(200).send("Wallet balance updated");
+        res.status(200).send({ message: 'Wallet balance updated' });
     } catch (error) {
         console.error('Error updating wallet balance:', error.message);
         res.status(500).json({ error: 'Internal server error' });
