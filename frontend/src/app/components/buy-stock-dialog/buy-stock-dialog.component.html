@@ -1,0 +1,28 @@
+<!-- Adjustments might be needed for the close button and alignment -->
+<div class="container m-2 py-2">
+  <div class="fs-4 fw-medium d-flex justify-content-between">
+    <span>{{ data.stock.ticker }}</span>
+    <button class="close-btn" (click)="closeDialog()">×</button>
+  </div>
+</div>
+
+<div class="border-top fw-normal p-3">
+  <p class="current-price">Current Price: {{ data.latestPrice }}</p>
+  <p class="wallet-balance">Money in Wallet: {{ walletBalance | currency }}</p>
+  <div class="d-flex align-items-center">
+    <p class="me-1 text-sm-center">Quantity: </p>
+    <input type="number" min="1" [(ngModel)]="quantity" (ngModelChange)="updateTotal()"
+           class="quantity-input w-100">
+  </div>
+  <p *ngIf="total > walletBalance" class="wallet-warning">Not enough money in wallet!</p>
+</div>
+
+<div class="container border-top pt-2">
+  <div class="row">
+    <div class="col-8 total-amount d-flex align-items-center">Total: {{ total | number:'1.2-2' }}</div>
+    <div class="col-4 text-sm-end">
+      <button class="btn buy-btn" [disabled]="total > walletBalance" (click)="confirmPurchase()">Buy
+      </button>
+    </div>
+  </div>
+</div>

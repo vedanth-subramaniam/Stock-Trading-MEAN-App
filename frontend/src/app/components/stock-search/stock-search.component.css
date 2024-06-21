@@ -1,0 +1,81 @@
+.search-bar {
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 70vw;
+  height: 20%;
+  border: 5px solid darkblue;
+  border-radius: 25px;
+  padding: 5px;
+  position: relative;
+}
+
+.search-btn, .clear-btn {
+  flex-shrink: 0;
+  min-width: 40px;
+  min-height: 40px;
+  min-font-size: 12px;
+}
+
+.no-outline:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+.form-stock-search {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+}
+
+.stock-company-logo {
+  width: 100px;
+  height: 100px;
+}
+
+.list-group li {
+  border-bottom: 0 none;
+  list-style-type: none;
+}
+
+.company-peers-container span {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.company-peers-container a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.favorite-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.stock-body .negative {
+  color: red;
+
+}
+
+.stock-body .positive {
+  color: green;
+}
+
+.company-insights {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.company-insights td, th {
+  text-align: center !important;
+}
+
+.mat-sort-header-container {
+  justify-content: center !important;
+}

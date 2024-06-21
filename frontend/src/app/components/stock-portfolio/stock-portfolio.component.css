@@ -1,0 +1,16 @@
+.stock-card {
+  border: 1px solid #dee2e6;
+}
+
+.card-header {
+  padding: 0.75rem 1.25rem;
+  background-color:  #a9a9a92e;
+  color: #110f0f;
+}
+.button-actions {
+  background-color: #ecebeb;
+}
+
+.table td, .table th {
+  border-bottom: none; /* Removes the top border from table cells if present */
+}

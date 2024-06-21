@@ -1,0 +1,25 @@
+.card {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.close {
+  font-size: 1.5rem;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.watch-card-title {
+  font-size: 1.2rem;
+}
+
+.watch-card-subtitle {
+  font-size: 1rem;
+}
+
+.card-body {
+  position: relative;
+}
+
